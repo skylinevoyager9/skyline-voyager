@@ -14,8 +14,8 @@ export default function Home() {
   const affiliateOn = hasAnyAffiliateTracking();
 
   return (
-    <main className="bg-stone-100">
-      <section className="relative overflow-hidden border-b border-white/10 bg-gradient-to-br from-slate-950 via-blue-950 to-black px-4 pb-24 pt-20 text-white sm:px-6 sm:pb-28 sm:pt-28">
+    <main className="w-full min-w-0 bg-stone-100">
+      <section className="relative w-full min-w-0 overflow-hidden border-b border-white/10 bg-gradient-to-br from-slate-950 via-blue-950 to-black px-4 pb-24 pt-20 text-white sm:px-6 sm:pb-28 sm:pt-28">
         <div
           className="pointer-events-none absolute inset-0"
           style={{ background: HERO_GLOW }}

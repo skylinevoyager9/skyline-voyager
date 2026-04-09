@@ -55,11 +55,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${sans.variable} ${display.variable} h-full`}>
-      <body className="min-h-full flex flex-col antialiased">
+    <html
+      lang="en"
+      className={`${sans.variable} ${display.variable} h-full w-full max-w-full overflow-x-hidden`}
+    >
+      <body className="flex min-h-full w-full max-w-full flex-col overflow-x-hidden antialiased">
         <JsonLd />
         <SiteHeader />
-        <div className="flex-1">{children}</div>
+        <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">{children}</div>
         <SiteFooter />
       </body>
     </html>
