@@ -36,12 +36,44 @@ export function SiteSearchForm({
   iconSubmit = false,
   className = "",
 }: Props) {
+  /** Icon-inside-input keeps width inside the grid column (avoids overlapping the nav). */
+  if (iconSubmit) {
+    return (
+      <form
+        action="/search"
+        method="get"
+        role="search"
+        className={`relative min-w-0 max-w-full ${className}`}
+      >
+        <label htmlFor={inputId} className="sr-only">
+          Search {compact ? "site" : "guides, destinations, and pages"}
+        </label>
+        <input
+          id={inputId}
+          name="q"
+          type="search"
+          defaultValue={defaultQuery}
+          placeholder={compact ? "Search…" : "Guides, destinations, topics…"}
+          autoComplete="off"
+          className="w-full min-w-0 rounded-xl border border-[var(--color-border)] bg-white py-2 pl-3 pr-11 text-sm text-[var(--color-ink)] outline-none ring-teal-600/0 transition placeholder:text-[var(--color-ink-faint)] focus:border-teal-600/40 focus:ring-2 focus:ring-teal-600/20"
+        />
+        <button
+          type="submit"
+          aria-label="Search"
+          className="absolute right-1 top-1/2 flex h-8 w-8 shrink-0 -translate-y-1/2 items-center justify-center rounded-lg bg-[var(--color-accent)] text-white transition hover:bg-[var(--color-accent-hover)]"
+        >
+          <SearchIcon className="shrink-0" />
+        </button>
+      </form>
+    );
+  }
+
   return (
     <form
       action="/search"
       method="get"
       role="search"
-      className={`flex min-w-0 max-w-full items-center gap-2 ${iconSubmit ? "gap-1.5" : ""} ${className}`}
+      className={`flex min-w-0 max-w-full items-center gap-2 ${className}`}
     >
       <label htmlFor={inputId} className="sr-only">
         Search {compact ? "site" : "guides, destinations, and pages"}
@@ -55,24 +87,17 @@ export function SiteSearchForm({
         autoComplete="off"
         className={`min-w-0 flex-1 rounded-xl border border-[var(--color-border)] bg-white px-3 text-sm text-[var(--color-ink)] outline-none ring-teal-600/0 transition placeholder:text-[var(--color-ink-faint)] focus:border-teal-600/40 focus:ring-2 focus:ring-teal-600/20 ${
           compact ? "py-2" : "py-2.5 sm:px-4"
-        } ${iconSubmit ? "min-w-0 px-2.5 sm:px-3" : ""}`}
+        }`}
       />
       <button
         type="submit"
         className={`shrink-0 rounded-xl bg-[var(--color-accent)] font-semibold text-white transition hover:bg-[var(--color-accent-hover)] ${
-          iconSubmit
-            ? "flex h-9 w-9 items-center justify-center p-0 sm:h-9 sm:w-9"
-            : compact
-              ? "px-3 py-2 text-xs sm:text-sm"
-              : "px-4 py-2.5 text-sm"
+          compact
+            ? "px-3 py-2 text-xs sm:text-sm"
+            : "px-4 py-2.5 text-sm"
         }`}
-        {...(iconSubmit ? { "aria-label": "Search" } : {})}
       >
-        {iconSubmit ? (
-          <SearchIcon className="shrink-0" />
-        ) : (
-          "Search"
-        )}
+        Search
       </button>
     </form>
   );
