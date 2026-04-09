@@ -30,7 +30,7 @@ export function HeaderBar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-surface)]/95 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:gap-4 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-[auto_minmax(0,15rem)_minmax(0,1fr)] lg:items-center lg:gap-x-4 xl:grid-cols-[auto_minmax(0,17rem)_minmax(0,1fr)] xl:gap-x-5 2xl:grid-cols-[auto_minmax(0,18rem)_minmax(0,1fr)]">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:gap-3 sm:px-6 lg:max-w-7xl lg:gap-4">
         <Link
           href="/"
           className="flex min-w-0 shrink-0 items-center gap-2 font-display text-lg font-semibold tracking-tight text-[var(--color-ink)] lg:gap-1.5 xl:gap-2.5"
@@ -53,26 +53,23 @@ export function HeaderBar() {
           </span>
         </Link>
 
-        <div className="relative z-0 mx-2 hidden min-w-0 max-w-full flex-1 overflow-hidden md:block md:max-w-sm lg:col-start-2 lg:mx-0 lg:w-full lg:min-w-0 lg:max-w-full lg:flex-none">
-          <SiteSearchForm
-            compact
-            iconSubmit
-            inputId="header-site-search"
-            className="w-full"
-          />
-        </div>
-
-        <Link
-          href="/search"
-          className="rounded-lg px-2 py-2 text-sm font-medium text-[var(--color-ink-muted)] transition hover:bg-black/[0.04] hover:text-[var(--color-ink)] md:hidden"
-        >
-          Search
-        </Link>
-
-        <nav
-          className="relative z-10 hidden min-h-10 min-w-0 justify-self-end lg:col-start-3 lg:flex lg:flex-nowrap lg:items-center lg:justify-end lg:gap-x-0.5 lg:overflow-x-auto lg:overflow-y-hidden lg:pl-3 lg:whitespace-nowrap lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden xl:gap-x-1"
-          aria-label="Main"
-        >
+        {/*
+          Flex cluster (not CSS grid): fixed-width search + nav are siblings with gap,
+          so the search field cannot paint over the first nav links.
+        */}
+        <div className="hidden min-h-10 min-w-0 flex-1 items-center justify-end gap-3 sm:gap-4 md:flex">
+          <div className="w-full min-w-0 max-w-[15rem] shrink-0 sm:max-w-[16rem] xl:max-w-[17rem]">
+            <SiteSearchForm
+              compact
+              iconSubmit
+              inputId="header-site-search"
+              className="w-full"
+            />
+          </div>
+          <nav
+            className="hidden min-h-10 min-w-0 lg:flex lg:flex-1 lg:flex-nowrap lg:items-center lg:justify-end lg:gap-x-0.5 lg:overflow-x-auto lg:overflow-y-hidden lg:whitespace-nowrap lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden xl:gap-x-1"
+            aria-label="Main"
+          >
           <Link
             href="/"
             className="shrink-0 rounded-md px-1.5 py-2 text-xs font-medium text-[var(--color-ink-muted)] transition hover:bg-black/[0.04] hover:text-[var(--color-ink)] xl:px-2 xl:text-sm"
@@ -97,7 +94,15 @@ export function HeaderBar() {
               {item.label}
             </Link>
           ))}
-        </nav>
+          </nav>
+        </div>
+
+        <Link
+          href="/search"
+          className="rounded-lg px-2 py-2 text-sm font-medium text-[var(--color-ink-muted)] transition hover:bg-black/[0.04] hover:text-[var(--color-ink)] md:hidden"
+        >
+          Search
+        </Link>
 
         <button
           type="button"
