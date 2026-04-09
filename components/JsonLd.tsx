@@ -9,6 +9,8 @@ const data = {
       url: site.url,
       email: site.email,
       logo: siteLogoAbsoluteUrl(),
+      description:
+        "Independent editorial travel publisher focused on US trips—hotels and lodging, flights, weekends, national parks, and premium ground transport—with transparent partner links.",
     },
     {
       "@type": "WebSite",

@@ -23,8 +23,9 @@ export function SiteFooter() {
               {site.name}
             </Link>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-[var(--color-ink-muted)]">
-              Flights, hotels, weekends, parks, and planning—USA plus Australia,
-              Bali, Europe &amp; UK. We may earn a commission from partner
+              Independent US travel guides with a stays-first lens—hotels and
+              lodging, then flights, weekends, parks, and planning—plus select
+              international frames. We may earn a commission from partner
               links—see our{" "}
               <Link
                 href="/affiliate-disclosure"
@@ -105,6 +106,22 @@ export function SiteFooter() {
               <li>
                 <Link href="/about" className="hover:text-[var(--color-accent)]">
                   About
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/about#how-it-works"
+                  className="hover:text-[var(--color-accent)]"
+                >
+                  How it works
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/about#partnerships"
+                  className="hover:text-[var(--color-accent)]"
+                >
+                  Partnerships &amp; press
                 </Link>
               </li>
               <li>

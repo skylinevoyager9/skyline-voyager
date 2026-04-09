@@ -7,7 +7,7 @@ import { site } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Affiliate Disclosure",
   description:
-    "How Skyline Voyager may earn commissions from partner links and how that affects readers.",
+    "How Skyline Voyager may earn commissions from partner links—including planned Booking.com and OTA tracking—with FTC-style transparency and checkout on partner sites.",
 };
 
 export default function AffiliateDisclosurePage() {
@@ -19,7 +19,7 @@ export default function AffiliateDisclosurePage() {
         Affiliate Disclosure
       </h1>
       <p className="mt-2 text-sm text-[var(--color-ink-faint)]">
-        Last updated: April 3, 2026
+        Last updated: April 9, 2026
       </p>
 
       <section className="mt-10 space-y-4 text-[var(--color-ink-muted)] leading-relaxed">
@@ -35,30 +35,44 @@ export default function AffiliateDisclosurePage() {
             . Some links on this website are <strong>affiliate links</strong>.
             If you click an affiliate link and make a qualifying purchase or
             booking, we may earn a commission or referral fee from the partner.
+            We intend to participate in major hotel and OTA programs—including{" "}
+            <strong>Booking.com</strong> where available—and to label partner
+            links clearly so readers know when a click may support our work.
           </p>
         ) : (
-          <p>
-            {site.legalName} (“{site.name},” “we,” “us”) operates{" "}
-            <Link
-              href={site.url}
-              className="font-medium text-[var(--color-accent)] underline-offset-2 hover:underline"
-            >
-              {site.domain}
-            </Link>
-            . Outbound links open third-party travel search and booking sites
-            in a new window. <strong>Tracked affiliate links are not active on
-            this site right now,</strong> so we do not earn a commission when you
-            use these links. We may add partner tracking links in the future;
-            this page will be updated when that happens.
-          </p>
+          <>
+            <p>
+              {site.legalName} (“{site.name},” “we,” “us”) operates{" "}
+              <Link
+                href={site.url}
+                className="font-medium text-[var(--color-accent)] underline-offset-2 hover:underline"
+              >
+                {site.domain}
+              </Link>{" "}
+              as a <strong>booking-friendly travel research site</strong>: we
+              publish editorial guides, then link to trusted partners (including{" "}
+              <strong>Booking.com</strong> for hotel and vacation-rental search)
+              so you can complete checkout on the brand you choose.
+            </p>
+            <p>
+              <strong>Tracked affiliate links are not active on this site right
+              now,</strong> so we do not yet earn a commission when you use
+              outbound links. We <strong>intend to add</strong> partner tracking
+              links—including for hotel and booking platforms such as{" "}
+              <strong>Booking.com</strong> via networks like Awin—in line with
+              each program&apos;s brand-safety and disclosure requirements. When
+              tracking goes live, we will update this page and surface short
+              disclosures near outbound booking buttons where appropriate.
+            </p>
+          </>
         )}
         <p>
           <strong>You do not pay extra</strong> because you used our link. The
           price you see comes from the merchant or booking platform.
         </p>
         <p>
-          We may participate in programs operated by airlines and flight search
-          platforms, hotels and online travel agencies, tour and activity
+          We may participate in programs operated by hotels and online travel
+          agencies, airlines and flight search platforms, tour and activity
           marketplaces, rental car companies, and similar travel-related
           services. Specific partners may change over time.
         </p>

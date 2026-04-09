@@ -9,8 +9,8 @@ import { CATEGORY_META } from "@/lib/guides/types";
 import { site } from "@/lib/site";
 
 const primary = [
+  { href: "/hotels", label: "Hotels & stays" },
   { href: "/flights", label: "Flights" },
-  { href: "/hotels", label: "Hotels" },
   { href: "/weekend-trips", label: "Weekends" },
   { href: "/national-parks", label: "Parks" },
   { href: "/car-rentals", label: "Cars" },
@@ -20,6 +20,7 @@ const primary = [
 ];
 
 const secondary = [
+  { href: "/about#how-it-works", label: "How it works" },
   { href: "/about", label: "About" },
   { href: "/legal", label: "Legal" },
 ];

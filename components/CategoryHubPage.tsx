@@ -88,8 +88,9 @@ export function CategoryHubPage({
               Editorial guides
             </h2>
             <p className="mt-2 max-w-xl text-stone-600">
-              Written for travelers who read the fine print—fees, timing, cabin
-              choice, and where quality actually shows up.
+              {category === "hotels"
+                ? "Written for travelers choosing where to sleep—neighborhood fit, total nightly cost after fees, and how to compare booking paths without guesswork."
+                : "Written for travelers who read the fine print—fees, timing, cabin choice, and where quality actually shows up."}
             </p>
           </div>
           <Link

@@ -32,6 +32,15 @@ export type CategoryMeta = {
 
 export const CATEGORY_META: CategoryMeta[] = [
   {
+    id: "hotels",
+    title: "Premium hotels & stays",
+    shortTitle: "Hotels",
+    path: "/hotels",
+    description:
+      "US trips start with where you sleep—luxury and boutique hotels, neighborhoods, resort fees, and how to compare real total stay cost.",
+    icon: "🏨",
+  },
+  {
     id: "flights",
     title: "Business & premium air travel",
     shortTitle: "Flights",
@@ -39,15 +48,6 @@ export const CATEGORY_META: CategoryMeta[] = [
     description:
       "Cabins, fare classes, bags, and timing—for travelers who care about comfort and schedule control.",
     icon: "✈",
-  },
-  {
-    id: "hotels",
-    title: "Premium hotels & stays",
-    shortTitle: "Hotels",
-    path: "/hotels",
-    description:
-      "Five-star, boutique, and suite-style stays—reviews, resort fees, and rentals vs. hotels.",
-    icon: "🏨",
   },
   {
     id: "weekends",

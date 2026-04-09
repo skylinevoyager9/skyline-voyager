@@ -41,6 +41,9 @@ const BY_SLUG: Record<string, string> = {
   "australia-domestic-flights-us-travelers": `https://images.unsplash.com/photo-1436491865332-7a61a109cc05?${Q}`,
   "schengen-uk-basics-us-passport": `https://images.unsplash.com/photo-1488646953014-85cb44e25828?${Q}`,
   "london-heathrow-gatwick-us-arrivals": `https://images.unsplash.com/photo-1514565131-fce0801e5785?${Q}`,
+  "ota-vs-direct-hotel-booking-us": `https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?${Q}`,
+  "us-city-neighborhood-stay-framework": `https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?${Q}`,
+  "road-trip-lodging-strategy-usa": `https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?${Q}`,
 };
 
 export function guideCoverImageSrc(guide: Guide): string {

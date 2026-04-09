@@ -30,7 +30,7 @@ export const HUB_THEME: Record<
       "radial-gradient(ellipse 70% 50% at 75% 20%, rgba(196,181,253,0.12), transparent 50%), radial-gradient(ellipse 50% 40% at 20% 85%, rgba(212,175,55,0.1), transparent 45%)",
     eyebrow: "Five-star · Boutique · Suites & residences",
     bookingHook:
-      "Filter for quality, neighborhood, and the amenities that matter—club floors, spas, late checkout where offered. Book directly with the platform that shows the full rate picture.",
+      "Editorial guides pair with live search: filter for neighborhood, quality, and the amenities that matter—club floors, spas, late checkout where offered. Compare total stay cost on the booking platform you trust; checkout always happens on the partner site.",
   },
   weekends: {
     gradient:
@@ -95,7 +95,7 @@ export const LIBRARY_HUB_THEME = {
     "bg-gradient-to-br from-slate-950 via-zinc-900 to-amber-950",
   heroGlow:
     "radial-gradient(ellipse 78% 52% at 82% 12%, rgba(251,191,36,0.14), transparent 52%), radial-gradient(ellipse 58% 42% at 12% 88%, rgba(56,189,248,0.08), transparent 48%), radial-gradient(ellipse 45% 38% at 55% 55%, rgba(255,255,255,0.05), transparent 55%)",
-  eyebrow: "Flights · Hotels · Weekends · Parks · Cars · Planning",
+  eyebrow: "Hotels · Flights · Weekends · Parks · Cars · Planning",
   bookingHook:
-    "Editorial guides for travelers who read the fine print—then book with live fares and real inventory on the partners you already trust. Every topic, one library.",
+    "Editorial guides for travelers who read the fine print—then book lodging and flights with live rates and real inventory on the partners you already trust. Every topic, one library.",
 } as const;

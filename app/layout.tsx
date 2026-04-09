@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     template: "%s | Skyline Voyager",
   },
   description:
-    "US travel guides: flights, hotels, weekend trips, national parks, car rental, and trip planning. Partner links may earn us a commission at no extra cost to you.",
+    "Independent US travel guides with a stays-first lens—hotels and lodging, then flights, weekends, parks, and cars. Partner links may earn us a commission at no extra cost to you.",
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -39,13 +39,13 @@ export const metadata: Metadata = {
     siteName: "Skyline Voyager",
     title: "Skyline Voyager | USA trip ideas & travel guides",
     description:
-      "Practical guides and weekend trip ideas for travel in the United States.",
+      "Editorial guides for US trips—where to stay, how to compare rates, and how to plan flights and weekends without the fluff.",
   },
   twitter: {
     card: "summary_large_image",
     title: "Skyline Voyager",
     description:
-      "Practical guides and weekend trip ideas for travel in the United States.",
+      "Editorial US travel guides: hotels, trips, and planning—with transparent partner links.",
   },
 };
 

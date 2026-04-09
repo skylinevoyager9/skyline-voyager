@@ -28,7 +28,7 @@ When we recommend a hotel or experience, we sometimes use partner links. If you 
 
 ## Next steps
 
-Browse [weekend guides](/weekend-trips) and [national parks](/national-parks) for ideas.
+Browse [weekend guides](/weekend-trips), the [Hotels & stays hub](/hotels), and [national parks](/national-parks) for ideas.
     `.trim(),
   },
   {
@@ -36,25 +36,49 @@ Browse [weekend guides](/weekend-trips) and [national parks](/national-parks) fo
     category: "hotels",
     title: "How we evaluate places to stay",
     description:
-      "What we look for in hotels and rentals when we suggest options to readers.",
+      "Our editorial framework for hotels and short-term lodging—location, total price, flexibility, and when reviews actually help.",
     date: "2026-04-02",
-    readTime: "5 min read",
+    readTime: "10 min read",
     body: `
-## Location beats amenities—for short trips
+## Location beats brochure amenities—on short trips
 
-For a two- or three-night stay, we prioritize **walkability**, **transit access**, or **easy parking** (depending on the city) over spa menus or club lounges.
+For two or three nights, we prioritize **walkability to your anchors** (meetings, museums, trailheads), **reliable transit**, or **sane parking**—depending on the city—before spa menus or club lounges. A perfect pool does not fix an hour each way to the places you came for.
 
-## Reviews: read the recent ones
+## Map your day, not just the pin
 
-Sort by newest. A property that was great three years ago may have changed management. Look for patterns in complaints, not one angry review.
+Before you book, drop pins for **morning coffee**, **main activity**, and **dinner**. If the triangle is ugly, reassess the neighborhood—even a “nicer” room across town can cost hours. Our [US city neighborhood framework](/guides/us-city-neighborhood-stay-framework) walks through this without naming a single property.
+
+## Reviews: recency and patterns
+
+Sort by **newest first**. A hotel that was excellent under old management may be noisy or thin-staffed today. Look for **repeated** complaints (noise, cleanliness, club-level access) rather than one emotional one-star.
 
 ## Total price, not headline price
 
-Resort fees, parking, and taxes can change the math. We call out “watch for extra charges” when it matters.
+**Resort**, **destination**, and **facility** fees, parking, and taxes belong in the same mental number as the nightly rate. See [resort fees explained](/guides/resort-fees-explained) and compare **all-in** before you celebrate a “deal.”
+
+## Cancellation and flexibility
+
+For volatile plans, **refundable or changeable** rates can be cheaper than cancellation insurance once you price the difference. Read the cancel-by time in **local hotel time**, not your home zone.
+
+## Boutique vs full-service chain
+
+Boutique wins on character and neighborhood integration; full-service chains win on **predictable standards**, elite benefits for loyal guests, and large meetings. Neither is universally “better”—match the trip.
+
+## OTA vs hotel-direct (high level)
+
+Online travel agencies often make **comparison and maps** easy; direct booking sometimes wins on **loyalty earning**, packages, or resolution when something breaks. We unpack tradeoffs in [OTA vs direct hotel booking](/guides/ota-vs-direct-hotel-booking-us)—without pretending one path always wins.
+
+## Road trips and one-night stops
+
+Highway trips hinge on **safe, simple nights** near your corridor. See [road-trip lodging in the US](/guides/road-trip-lodging-strategy-usa).
 
 ## Transparency
 
-We may earn a commission when you book through links on this site. Details: [Affiliate disclosure](/affiliate-disclosure).
+We may earn a commission when you book through links on this site. Checkout is always on the partner you choose. Details: [Affiliate disclosure](/affiliate-disclosure).
+
+## Next steps on Skyline Voyager
+
+Browse the [Hotels & stays hub](/hotels), [compare vacation rentals vs hotels for weekends](/guides/vacation-rental-vs-hotel-weekend), or jump through to [live search tools](/hotels#book-trip) when you are ready to book.
     `.trim(),
   },
   {
@@ -81,6 +105,10 @@ Cap the itinerary at three anchors per day if you tend to over-plan.
 ## Book through trusted partners
 
 Partner links may support our work at no extra cost to you. [Full disclosure](/affiliate-disclosure).
+
+## Where to stay
+
+Pair these shapes with neighborhood thinking in [US city stays](/guides/us-city-neighborhood-stay-framework) and live search on the [Hotels hub](/hotels).
     `.trim(),
   },
   {
@@ -98,7 +126,7 @@ Most US routes have **price swings** by day of week. If your trip is optional, t
 
 ## Compare total trip cost
 
-Add **bags**, **seat fees**, and **parking or rides** to the airport. A slightly higher fare with a free bag can beat “cheap” basic economy.
+Add **bags**, **seat fees**, and **parking or rides** to the airport. A slightly higher fare with a free bag can beat “cheap” basic economy. After flights firm up, layer in **lodging** on the [Hotels & stays hub](/hotels) so airport choice and hotel neighborhood still fit together.
 
 ## Book major holidays early
 
@@ -189,6 +217,10 @@ Cleaning fees and service fees on short-term rentals are the parallel—normaliz
 ## Before you book
 
 Filter or sort by total price when the platform allows. Read the property’s fee paragraph once, not ten times from regret.
+
+## Related on Skyline Voyager
+
+[OTA vs direct hotel booking](/guides/ota-vs-direct-hotel-booking-us) · [How we evaluate places to stay](/guides/how-we-pick-hotels) · [Hotels hub](/hotels)
     `.trim(),
   },
   {
@@ -215,6 +247,10 @@ Key exchange, trash rules, and strip-the-beds policies eat **vacation minutes**�
 ## Hybrid option
 
 Hotel two nights + one special dinner out can beat a rental + cooking on a short break.
+
+## More lodging context
+
+[How we pick hotels](/guides/how-we-pick-hotels) · [Neighborhood framework for US cities](/guides/us-city-neighborhood-stay-framework) · [Hotels & stays hub](/hotels)
     `.trim(),
   },
   {
@@ -266,7 +302,7 @@ Coffee, **one highlight** you would regret missing, then travel buffer. Airports
 
 ## Stay choice
 
-Near transit or your Saturday anchor—minimize **cross-town** stress on a short clock.
+Near transit or your Saturday anchor—minimize **cross-town** stress on a short clock. If you are unsure which part of town fits, use our [US city neighborhood framework](/guides/us-city-neighborhood-stay-framework), then browse the [Hotels hub](/hotels) when you are ready to compare rates.
     `.trim(),
   },
   {
@@ -297,6 +333,10 @@ Elevation, **afternoon thunderstorms**, and desert heat change plans fast. Carry
 ## Leave no trace
 
 Stay on trails, pack out trash, and give **wildlife distance**—it keeps parks open for everyone.
+
+## Gateway lodging
+
+Inside-park rooms and **gateway towns** fill early in peak season—book as soon as dates firm, and read [road-trip lodging](/guides/road-trip-lodging-strategy-usa) if you are driving between parks. The [Hotels hub](/hotels) links to live stay search when you are ready.
     `.trim(),
   },
   {
@@ -322,7 +362,7 @@ Pick **one** for a relaxed trip, or both if you are a photographer—schedule **
 
 ## Lodging strategy
 
-**Inside the park** saves dawn/dusk drive time; **Tusayan** or **Flagstaff** can save money with tradeoffs.
+**Inside the park** saves dawn/dusk drive time; **Tusayan** or **Flagstaff** can save money with tradeoffs. Compare **total** nightly cost (taxes, fees) on the [Hotels hub](/hotels)—and see [how we evaluate stays](/guides/how-we-pick-hotels) if you are torn between two areas.
     `.trim(),
   },
   {
@@ -522,7 +562,7 @@ Domestic US trips need **USB-C blocks** and cables; no voltage drama—still bri
     body: `
 ## Start with nights
 
-Multiply **nightly lodging cap** by nights—if that number scares you, dates or destination needs a tweak.
+Multiply **nightly lodging cap** by nights—if that number scares you, dates or destination needs a tweak. When you are ready to compare real rates, use the [Hotels hub](/hotels) alongside [our hotel evaluation framework](/guides/how-we-pick-hotels).
 
 ## Food bands
 
@@ -663,6 +703,144 @@ If you **fly into LHR and out of LGW**, treat it as a **self-transfer city**—a
 ## Partner links
 
 Flight and stay links may support our work. [Affiliate disclosure](/affiliate-disclosure).
+    `.trim(),
+  },
+  {
+    slug: "ota-vs-direct-hotel-booking-us",
+    category: "hotels",
+    title: "OTA vs direct hotel booking in the US",
+    description:
+      "When a booking site helps you compare, when the hotel’s own channel wins, and how to think about loyalty, packages, and price parity.",
+    date: "2026-04-25",
+    readTime: "9 min read",
+    body: `
+## There is no single “always book here” rule
+
+**Online travel agencies (OTAs)**—large booking platforms—excel at **side-by-side comparison**, maps, and showing many properties at once. **Direct** booking (hotel web or call center) can excel at **loyalty program credit**, some bundles, and occasional service when plans change. Smart travelers pick the path that fits **this** trip.
+
+## What OTAs usually do well
+
+- **Transparent sorting** by price, guest score, neighborhood, and filters (free cancellation, breakfast included) when data is accurate.
+- **One cart** if you are weighing several brands in the same city.
+- **Maps** that help you see distance to your real anchors—not just the city center.
+
+Always normalize to **total stay cost** after taxes and fees; our [resort fees guide](/guides/resort-fees-explained) explains why the headline rate lies.
+
+## What direct booking can offer
+
+- **Loyalty points and elite benefits** on programs that honor third-party stays inconsistently.
+- **Packages** (parking + room, dining credit) that never appear on aggregators.
+- Sometimes **easier** room-type notes (“quiet, high floor”)—though not guaranteed.
+
+If status or points matter for this stay, read the program’s rules for **qualifying rates** before you click.
+
+## Price parity is not a law of physics
+
+Rates often **match** between channels; sometimes they **diverge** because of promotions, member-only prices, or currency display quirks. If the gap is large, screenshot both paths and read **cancellation** carefully—cheap can be restrictive.
+
+## Changes, refunds, and who answers the phone
+
+Who you paid usually controls **who fixes** a problem. If you book through an OTA, the hotel may tell you to call the platform. If that worries you on a complex itinerary, factor support into the decision—not just dollars.
+
+## Rentals vs traditional hotels
+
+Short-term rentals carry different **fee stacks and rules**; compare to hotels for the same dates using **per-night all-in** math. See [vacation rental vs hotel for a weekend](/guides/vacation-rental-vs-hotel-weekend).
+
+## How Skyline Voyager fits in
+
+We publish editorial guides first; partner links may pay us a commission **at no extra cost to you**. Checkout always happens on the partner you choose. [Affiliate disclosure](/affiliate-disclosure).
+
+## Keep reading
+
+[How we evaluate places to stay](/guides/how-we-pick-hotels) · [Hotels & stays hub](/hotels) · [Neighborhood framework for US cities](/guides/us-city-neighborhood-stay-framework)
+    `.trim(),
+  },
+  {
+    slug: "us-city-neighborhood-stay-framework",
+    category: "hotels",
+    title: "Choosing a neighborhood for a US city stay",
+    description:
+      "A practical framework—CBD vs creative districts vs airport corridors—without pretending every city is the same.",
+    date: "2026-04-26",
+    readTime: "8 min read",
+    body: `
+## Start from Tuesday morning, not Instagram
+
+Pick the **three stops** that define the trip: a meeting, a museum block, a dinner reservation, or a concert venue. Your hotel neighborhood should **minimize dead time** between them—not maximize skyline likes.
+
+## Central business districts
+
+**Pros:** Transit hubs, predictable full-service hotels, shorter walks to corporate addresses. **Cons:** Quieter nights and weekends in some cities, breakfast prices at captive audiences. Great when **work** anchors the calendar.
+
+## Arts, warehouse, and “scene” districts
+
+**Pros:** Walkable dinners, independent coffee, character. **Cons:** Noise from nightlife, variable safety block-by-block—read **recent** visitor reviews and local guidance; street conditions change faster than guidebooks.
+
+## Airport strips and beltways
+
+**Pros:** Early flights, fleet parking, sometimes value. **Cons:** You pay **taxi or ride time** to the actual city—math that into “cheap.” Good for **one night** before a drive, rarely ideal for a leisure core.
+
+## Parking cities vs transit cities
+
+In **car-first** metros (many Sun Belt and suburban layouts), “only 8 miles” can mean **45 minutes** at rush hour—prioritize **parking packages** or valet clarity. In **transit-heavy** cores, nearness to a **reliable** line beats a slightly nicer room five connections away.
+
+## Safety and comfort: use fresh signals
+
+Prefer **pattern data** over fear: time your walks, stick to lit arterials late night, and know how you will get back after events. Hotel staff can describe **current** blocks to avoid—ask at check-in.
+
+## Put it together
+
+Short list **two** candidate neighborhoods, map your anchors in each, compare **total hotel cost** (fees + parking), then book the fit—not just the stars. More on our [Hotels hub](/hotels) and [how we pick lodging](/guides/how-we-pick-hotels).
+
+## Partner links
+
+When you use outbound booking links from this site, we may earn a commission at no extra cost to you. [Affiliate disclosure](/affiliate-disclosure).
+    `.trim(),
+  },
+  {
+    slug: "road-trip-lodging-strategy-usa",
+    category: "hotels",
+    title: "Road-trip lodging: where to sleep between long drives",
+    description:
+      "One-night stops, highway exits, brand consistency, and when to splurge on a real night in a destination city.",
+    date: "2026-04-27",
+    readTime: "8 min read",
+    body: `
+## Name two kinds of nights
+
+**Transit nights** are for sleep and a clean shower—minimize complexity. **Destination nights** are where you **arrive early enough** to enjoy a meal, a view, or a walk. Price and pick them differently.
+
+## Transit nights: stay close to the road
+
+After 400 miles, “just 20 minutes off the highway” feels longer than it sounds. Prefer **visible brand corridors** near major interstates when safety and predictability matter, especially late arrivals. Book ahead on **summer weekends** along national-park gateways—inventory vanishes.
+
+## Destination nights: buy back your evening
+
+If the city is the point, spring for **central or scenic** lodging—even if the room is smaller. You are buying **hours** not square feet.
+
+## One-way trips and drop fees
+
+If you are flying in and driving out (or reverse), [one-way rental drop fees](/guides/one-way-rental-drop-fees) can dominate the budget—optimize the **whole** stack: car + fuel + lodging, not each line alone.
+
+## Two-night minimums and events
+
+Some markets enforce **two-night** stays around events or Saturdays. If you only need one night, scan nearby towns **30–45 minutes** out—sometimes a fair trade for highway trips, less so for city cores.
+
+## Cleanliness and consistency
+
+Chains vary by owner, but **standards documents** exist for a reason on pure transit nights—read recent reviews for **noise** (highway side vs pool side) before you auto-click the lowest rate.
+
+## When you get there
+
+Drop bags, set tomorrow’s first stop in maps, hydrate, and screenshot your **confirmation**—cellular gaps still happen in passes and canyons.
+
+## On this site
+
+Continue with [national parks overview](/guides/national-parks-trip-overview), [how we pick hotels](/guides/how-we-pick-hotels), or the [Hotels & stays hub](/hotels) when you are ready to search.
+
+## Disclosure
+
+Partner links may support our work at no extra cost to you. [Affiliate disclosure](/affiliate-disclosure).
     `.trim(),
   },
 ];

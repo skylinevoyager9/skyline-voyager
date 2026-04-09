@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { GuideArticleHeader } from "@/components/GuideArticleHeader";
 import { GuideArticleJsonLd } from "@/components/GuideArticleJsonLd";
+import { GuideArticlePartnerNote } from "@/components/GuideArticlePartnerNote";
 import { GuideBody } from "@/components/GuideBody";
 import { GuidePartnerStrip } from "@/components/GuidePartnerStrip";
 import { GuideRelated } from "@/components/GuideRelated";
@@ -80,9 +81,9 @@ export default async function GuidePage({ params }: Props) {
             {skipIcon}
           </span>
           <span className="text-left text-sm font-semibold leading-snug text-stone-800 sm:text-[15px]">
-            Skip to booking tools — compare flights, stays, cars &amp; tours
+            Skip to booking tools — compare stays, flights, cars &amp; tours
             <span className="mt-0.5 block text-xs font-normal text-stone-500">
-              Opens partner sites in a new tab · {cat.shortTitle} picks first
+              Opens partner sites in a new tab · picks match this topic first
             </span>
           </span>
           <span
@@ -100,6 +101,7 @@ export default async function GuidePage({ params }: Props) {
               <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-stone-400">
                 In this guide
               </p>
+              <GuideArticlePartnerNote />
               <GuideBody markdown={guide.body} />
             </div>
             <GuideRelated guides={related} />

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { GuideCardHero } from "@/components/GuideCardHero";
 import { GuidePartnerStrip } from "@/components/GuidePartnerStrip";
-import { CATEGORY_META, guides, guidesSortedByDate } from "@/lib/guides";
+import { CATEGORY_META, DESTINATION_META, guides, guidesSortedByDate } from "@/lib/guides";
 import { hasAnyAffiliateTracking } from "@/lib/partner-links";
 import { site } from "@/lib/site";
 
@@ -42,43 +42,60 @@ export default function Home() {
           <div className="mt-8 flex flex-wrap gap-3 text-xs font-medium uppercase tracking-[0.22em] text-amber-200/80">
             <span>United States</span>
             <span className="text-white/35">·</span>
-            <span>Flights &amp; stays</span>
+            <span>Stays &amp; neighborhoods</span>
             <span className="text-white/35">·</span>
-            <span>Parks &amp; weekends</span>
+            <span>Flights &amp; weekends</span>
           </div>
 
           <h1 className="font-display mt-5 max-w-3xl text-4xl font-bold leading-[1.06] tracking-tight sm:text-5xl lg:text-[3.35rem]">
-            US travel with editorial clarity—cabins, stays, and routes that fit
-            your standard
+            US travel with editorial clarity—where you stay, then how you get
+            there
           </h1>
           <p className="mt-6 max-w-2xl text-base font-light leading-relaxed text-white/88 sm:text-lg">
             {site.legalName} publishes independent guides for travelers who read
-            the details. Search flights, hotels, cars, and experiences through
-            our partner tools—we may earn a commission at no extra cost to you.
+            the details. Compare hotels and lodging first, then flights, cars,
+            and experiences through trusted partners (including{" "}
+            <strong className="font-semibold text-white">Booking.com</strong> for
+            stay search)—we may earn a commission at no extra cost to you.
           </p>
 
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
             <Link
-              href="#book-trip"
+              href="/hotels#book-trip"
               className="inline-flex min-h-[54px] items-center justify-center rounded-full bg-gradient-to-r from-amber-100 via-stone-100 to-amber-50 px-8 py-4 text-base font-bold text-slate-900 shadow-lg ring-1 ring-amber-400/35 transition hover:from-amber-50 hover:via-white hover:to-amber-50 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
             >
-              Compare cabins &amp; stays — book in a new tab
+              Find your next hotel →
             </Link>
             <div className="flex flex-wrap gap-3">
               <Link
-                href="/guides"
+                href="/guides?cat=hotels"
                 className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-white/35 bg-white/10 px-6 py-3 text-sm font-bold text-white backdrop-blur-sm transition hover:border-white/50 hover:bg-white/15"
               >
-                {guides.length} editorial guides
+                Browse hotel &amp; stay guides
               </Link>
               <Link
-                href="/hotels"
+                href="#book-trip"
                 className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-white/25 px-6 py-3 text-sm font-semibold text-white/95 transition hover:border-amber-200/40 hover:bg-white/10"
               >
-                Premium stays hub
+                Compare flights &amp; cars — book in a new tab
               </Link>
             </div>
           </div>
+          <p className="mt-3 max-w-xl text-sm text-amber-100/85">
+            <Link
+              href="/about#how-it-works"
+              className="font-semibold text-white underline decoration-white/35 underline-offset-2 hover:decoration-white"
+            >
+              How this site works
+            </Link>
+            {" · "}
+            <Link
+              href="/guides"
+              className="font-semibold text-white/95 underline decoration-white/30 underline-offset-2 hover:decoration-white"
+            >
+              All {guides.length} guides
+            </Link>
+          </p>
           <p className="mt-4 max-w-xl text-sm text-amber-100/80">
             Checkout always happens on the partner you choose. No Skyline Voyager
             account required to search.
@@ -113,6 +130,48 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="border-b border-stone-200 bg-white px-4 py-12 sm:px-6 sm:py-14">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="font-display text-xl font-bold text-stone-900 sm:text-2xl">
+            Explore by destination
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm text-stone-600 sm:text-base">
+            Jump into region guides and filtered stays—then book on partner sites
+            from our{" "}
+            <Link
+              href="/hotels#book-trip"
+              className="font-semibold text-amber-900 underline decoration-amber-900/30 underline-offset-2 hover:decoration-amber-900"
+            >
+              hotel search tools
+            </Link>
+            .
+          </p>
+          <ul className="mt-6 flex flex-wrap gap-2 sm:gap-3">
+            {DESTINATION_META.map((d) => (
+              <li key={d.id}>
+                <Link
+                  href={d.path}
+                  className="inline-flex min-h-[44px] items-center rounded-full border border-stone-200 bg-stone-50 px-4 py-2.5 text-sm font-semibold text-stone-800 transition hover:border-amber-800/35 hover:bg-white"
+                >
+                  <span className="mr-2" aria-hidden>
+                    {d.icon}
+                  </span>
+                  {d.shortTitle}
+                </Link>
+              </li>
+            ))}
+            <li>
+              <Link
+                href="/destinations"
+                className="inline-flex min-h-[44px] items-center rounded-full border border-amber-900/25 bg-amber-50 px-4 py-2.5 text-sm font-bold text-amber-950 transition hover:bg-amber-100/90"
+              >
+                All destinations →
+              </Link>
+            </li>
+          </ul>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -120,8 +179,9 @@ export default function Home() {
               Explore by topic
             </h2>
             <p className="mt-2 max-w-xl text-stone-600">
-              Each hub is built for business and premium trips—flights, five-star
-              filters, weekends, parks, executive rental cars, and planning.
+              Each hub is built for business and premium trips—hotels and stays
+              first, then flights, weekends, parks, executive rental cars, and
+              planning.
             </p>
           </div>
           <Link
@@ -165,11 +225,11 @@ export default function Home() {
             {[
               {
                 title: "Depth without noise",
-                text: "Cabins, resort fees, timing, and tradeoffs—so you can decide fast without sales fluff.",
+                text: "Neighborhood fit, resort fees, cabin choices, and timing—so you can decide fast without sales fluff.",
               },
               {
                 title: "One place to branch out",
-                text: "Air, stays, cars, parks, and weekends—each topic has its own hub and editorial guides.",
+                text: "Stays, air, cars, parks, and weekends—each topic has its own hub and editorial guides.",
               },
               {
                 title: "Transparent economics",
@@ -199,7 +259,7 @@ export default function Home() {
               Latest editorial guides
             </h2>
             <p className="mt-2 max-w-lg text-stone-600">
-              Recently published across flights, premium stays, parks, and
+              Recently published across premium stays, flights, parks, and
               weekends.
             </p>
           </div>
@@ -275,10 +335,16 @@ export default function Home() {
               </>
             ) : (
               <>
-                Outbound links open partner booking sites in a new tab so you can
-                compare prices and policies. Tracked affiliate links are not
-                active yet; when they are, we will describe that in our
-                disclosure—without changing the price you see on the partner site.
+                Outbound links open partner booking sites (including Booking.com
+                for stays) in a new tab. Tracked affiliate IDs are not active
+                yet; we intend to add them for qualifying programs—see our{" "}
+                <Link
+                  href="/affiliate-disclosure"
+                  className="font-semibold text-amber-950 underline decoration-amber-900/35 underline-offset-2 hover:decoration-amber-900"
+                >
+                  affiliate disclosure
+                </Link>{" "}
+                for the plan. You never pay a higher rate on our behalf.
               </>
             )}
           </p>

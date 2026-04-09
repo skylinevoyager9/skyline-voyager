@@ -5,7 +5,7 @@ import { site } from "@/lib/site";
 export const metadata: Metadata = {
   title: "About",
   description:
-    `${site.name} publishes US travel guides for business and premium travelers—editorial depth, transparent partner links, checkout on the brands you trust.`,
+    `${site.name} (${site.legalName}) helps premium travelers research and book stays and flights through trusted partners including Booking.com—editorial guides first, checkout on partner sites.`,
 };
 
 const HERO_GLOW =
@@ -42,17 +42,53 @@ export default function AboutPage() {
             About {site.name}
           </h1>
           <p className="mt-4 max-w-xl text-base font-light leading-relaxed text-white/85">
-            Editorial US travel guidance—honest tradeoffs, not brochure copy.
+            US publisher of independent travel guidance—lodging and trips first,
+            honest tradeoffs, not brochure copy.
           </p>
         </div>
       </section>
 
       <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 sm:py-16">
         <div className="rounded-3xl border border-stone-200 bg-white p-8 shadow-sm sm:p-10">
-          <p className="text-stone-700 leading-relaxed">
-            {site.legalName} publishes independent guides for travelers who care
-            about <strong className="text-stone-900">cabins and fare classes</strong>
-            , <strong className="text-stone-900">premium and boutique stays</strong>
+          <section
+            id="how-it-works"
+            className="border-b border-stone-200 pb-8"
+            aria-labelledby="how-it-works-heading"
+          >
+            <h2
+              id="how-it-works-heading"
+              className="font-display text-xl font-bold text-stone-900"
+            >
+              How this site works
+            </h2>
+            <p className="mt-3 text-stone-700 leading-relaxed">
+              We help premium travelers <strong className="text-stone-900">research</strong>{" "}
+              destinations and cabin or room choices, then{" "}
+              <strong className="text-stone-900">book flights, hotels, and stays</strong>{" "}
+              through trusted booking partners—including{" "}
+              <strong className="text-stone-900">Booking.com</strong> for hotel and
+              vacation-rental search when you use our stay tools. Editorial guides
+              explain fees, timing, and tradeoffs;{" "}
+              <strong className="text-stone-900">checkout always happens on the partner</strong>{" "}
+              you choose (new tab). We are working toward formal affiliate
+              relationships with major booking platforms and use tracking links only
+              in line with their brand-safety and disclosure rules—see our{" "}
+              <Link
+                href="/affiliate-disclosure"
+                className="font-bold text-amber-900 underline decoration-amber-900/30 underline-offset-2 hover:decoration-amber-900"
+              >
+                affiliate disclosure
+              </Link>
+              .
+            </p>
+          </section>
+
+          <p className="mt-8 text-stone-700 leading-relaxed">
+            {site.legalName} is a United States–based publisher of independent
+            guides for travelers who care about{" "}
+            <strong className="text-stone-900">premium and boutique stays</strong>
+            , <strong className="text-stone-900">neighborhood fit and total stay cost</strong>
+            , <strong className="text-stone-900">cabins and fare classes</strong>
             , <strong className="text-stone-900">short elevated breaks</strong>,{" "}
             <strong className="text-stone-900">national parks</strong>,{" "}
             <strong className="text-stone-900">rental cars</strong> (including
@@ -63,7 +99,7 @@ export default function AboutPage() {
           </p>
           <p className="mt-5 text-stone-700 leading-relaxed">
             This site is supported in part through affiliate relationships with
-            flight search tools, booking platforms, and experience providers.
+            booking platforms, flight search tools, and experience providers.
             When you use our links, we may receive a commission.{" "}
             <strong className="text-stone-900">
               That does not increase the price you pay.
@@ -83,6 +119,35 @@ export default function AboutPage() {
             You complete checkout on the partner site you choose—always in a new
             tab when you use our tools from this site.
           </p>
+
+          <section
+            id="partnerships"
+            className="mt-10 border-t border-stone-200 pt-10"
+            aria-labelledby="partnerships-heading"
+          >
+            <h2
+              id="partnerships-heading"
+              className="font-display text-lg font-bold text-stone-900"
+            >
+              Brands, networks &amp; press
+            </h2>
+            <p className="mt-3 text-stone-700 leading-relaxed">
+              {site.legalName} is a US-based editorial travel publisher. Primary
+              focus: <strong className="text-stone-900">domestic lodging and trips</strong>{" "}
+              for business and premium leisure readers. We surface live search and
+              booking through partner programs where disclosed;{" "}
+              <strong className="text-stone-900">checkout always happens on the partner</strong>
+              . For media kits, verification, or partnership questions, email{" "}
+              <a
+                href={`mailto:${site.email}?subject=Partnership%20inquiry`}
+                className="font-bold text-amber-900 underline decoration-amber-900/30 underline-offset-2 hover:decoration-amber-900"
+              >
+                {site.email}
+              </a>
+              —include your network or program name in the subject line so we can
+              respond quickly.
+            </p>
+          </section>
 
           <div className="mt-10 flex flex-wrap gap-4 border-t border-stone-200 pt-8">
             <Link

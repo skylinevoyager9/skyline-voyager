@@ -15,7 +15,7 @@ export default function PrivacyPage() {
         Privacy Policy
       </h1>
       <p className="mt-2 text-sm text-[var(--color-ink-faint)]">
-        Last updated: April 3, 2026
+        Last updated: April 9, 2026
       </p>
 
       <div className="mt-10 space-y-6 text-[var(--color-ink-muted)] leading-relaxed">
@@ -67,6 +67,22 @@ export default function PrivacyPage() {
             rights. Affiliate partners may use their own cookies when you
             leave our Site to complete a booking; their practices are governed
             by their respective policies.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="font-display text-xl font-semibold text-[var(--color-ink)]">
+            Bookings and payments
+          </h2>
+          <p className="mt-3">
+            We do <strong className="text-[var(--color-ink)]">not</strong> take
+            payment for flights, hotels, or other travel services on this Site.
+            When you book, you enter payment details on the{" "}
+            <strong className="text-[var(--color-ink)]">partner&apos;s</strong>{" "}
+            checkout page (for example an airline, hotel chain, online travel
+            agency, or tour operator). We do{" "}
+            <strong className="text-[var(--color-ink)]">not</strong> store your
+            credit card or bank information for those transactions.
           </p>
         </section>
 

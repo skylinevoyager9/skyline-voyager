@@ -20,7 +20,7 @@ export type SearchItem = {
 const PAGE_ENTRIES: Omit<SearchItem, "type">[] = [
   {
     title: "Home",
-    description: `${site.name} — USA and international travel guides, flights, hotels, and trip planning.`,
+    description: `${site.name} — US travel guides with a stays-first lens; hotels, flights, weekends, parks, and planning.`,
     href: "/",
     hint: "Site",
   },
@@ -40,6 +40,18 @@ const PAGE_ENTRIES: Omit<SearchItem, "type">[] = [
     title: "About",
     description: `What ${site.name} is and how we approach travel content.`,
     href: "/about",
+    hint: "Company",
+  },
+  {
+    title: "Partnerships & press",
+    description: `Media kits, advertiser verification, and partnership contact for ${site.legalName}.`,
+    href: "/about#partnerships",
+    hint: "Company",
+  },
+  {
+    title: "How this site works",
+    description: `Research and book stays and flights through trusted partners including Booking.com; checkout on partner sites.`,
+    href: "/about#how-it-works",
     hint: "Company",
   },
   {

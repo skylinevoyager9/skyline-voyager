@@ -19,7 +19,7 @@ import { site } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Travel library",
   description:
-    "Editorial travel guides for premium travelers—USA, Europe, UK, Australia, Bali, and more: flights, hotels, weekends, parks, cars, and trip planning from Skyline Voyager.",
+    "Independent travel library for premium travelers—hotels and lodging first, then flights, weekends, parks, cars, and planning. USA plus Australia, Bali, Europe, and UK frames from Skyline Voyager.",
 };
 
 const CATEGORY_IDS: GuideCategory[] = [
