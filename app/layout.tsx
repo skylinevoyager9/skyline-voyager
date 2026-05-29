@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     template: "%s | Skyline Voyager",
   },
   description:
-    "Independent US travel guides with a stays-first lens—hotels and lodging, then flights, weekends, parks, and cars. Partner links may earn us a commission at no extra cost to you.",
+    "US travel guides and live flight search—book air travel on Skyline Voyager with real-time fares via Duffel.",
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -39,13 +39,13 @@ export const metadata: Metadata = {
     siteName: "Skyline Voyager",
     title: "Skyline Voyager | USA trip ideas & travel guides",
     description:
-      "Editorial guides for US trips—where to stay, how to compare rates, and how to plan flights and weekends without the fluff.",
+      "Editorial US trip guides and live flight booking—search fares and checkout on Skyline Voyager.",
   },
   twitter: {
     card: "summary_large_image",
     title: "Skyline Voyager",
     description:
-      "Editorial US travel guides: hotels, trips, and planning—with transparent partner links.",
+      "Editorial US travel guides and Duffel-powered flight booking.",
   },
 };
 

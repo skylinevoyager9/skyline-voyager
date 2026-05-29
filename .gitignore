@@ -20,6 +20,10 @@
 # production
 /build
 
+# live flight service fee (owner-published; local / self-hosted)
+/data/published-flight-markup.json
+/data/bookings.jsonl
+
 # misc
 .DS_Store
 *.pem

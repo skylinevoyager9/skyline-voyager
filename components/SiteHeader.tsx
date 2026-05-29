@@ -1,5 +1,6 @@
 import { HeaderBar } from "@/components/HeaderBar";
+import { getFlightsNavHref } from "@/lib/flights/links";
 
 export function SiteHeader() {
-  return <HeaderBar />;
+  return <HeaderBar flightsHref={getFlightsNavHref()} />;
 }

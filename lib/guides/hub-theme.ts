@@ -21,7 +21,7 @@ export const HUB_THEME: Record<
       "radial-gradient(ellipse 80% 50% at 85% 15%, rgba(212,175,55,0.14), transparent 55%), radial-gradient(ellipse 60% 40% at 10% 90%, rgba(56,189,248,0.08), transparent 50%)",
     eyebrow: "Business & premium cabins · Schedule control",
     bookingHook:
-      "Compare cabins—from economy to business and first—side by side with live fares. Flexible dates help you protect your calendar; checkout stays on the airline or OTA you select.",
+      "Search live fares and book on Skyline Voyager—economy through first where offered, with transparent pricing before you pay.",
   },
   hotels: {
     gradient:
@@ -30,7 +30,7 @@ export const HUB_THEME: Record<
       "radial-gradient(ellipse 70% 50% at 75% 20%, rgba(196,181,253,0.12), transparent 50%), radial-gradient(ellipse 50% 40% at 20% 85%, rgba(212,175,55,0.1), transparent 45%)",
     eyebrow: "Five-star · Boutique · Suites & residences",
     bookingHook:
-      "Editorial guides pair with live search: filter for neighborhood, quality, and the amenities that matter—club floors, spas, late checkout where offered. Compare total stay cost on the booking platform you trust; checkout always happens on the partner site.",
+      "Neighborhood and stay-quality guides—editorial only. Book flights with live fares on Skyline Voyager; we do not send you to Booking.com or other hotel marketplaces.",
   },
   weekends: {
     gradient:
@@ -39,7 +39,7 @@ export const HUB_THEME: Record<
       "radial-gradient(ellipse 75% 55% at 80% 25%, rgba(251,191,36,0.12), transparent 50%), radial-gradient(ellipse 45% 35% at 15% 80%, rgba(255,255,255,0.06), transparent 45%)",
     eyebrow: "Short breaks · City & coast · Minimal friction",
     bookingHook:
-      "Elevate Friday–Sunday with stays that match your standards—signature dining, skyline views, or quiet country inns. Pair flights or drives in one planning flow.",
+      "Plan a short break with live weekend airfares—search, compare, and book flights here. Stay ideas in our guides; flight checkout is on Skyline Voyager.",
   },
   parks: {
     gradient:
@@ -72,8 +72,8 @@ export const HUB_THEME: Record<
 
 export const HUB_EMPHASIS: Record<GuideCategory, PartnerKey> = {
   flights: "flights",
-  hotels: "booking",
-  weekends: "booking",
+  hotels: "flights",
+  weekends: "flights",
   parks: "viator",
   cars: "cars",
   planning: "flights",
@@ -97,5 +97,5 @@ export const LIBRARY_HUB_THEME = {
     "radial-gradient(ellipse 78% 52% at 82% 12%, rgba(251,191,36,0.14), transparent 52%), radial-gradient(ellipse 58% 42% at 12% 88%, rgba(56,189,248,0.08), transparent 48%), radial-gradient(ellipse 45% 38% at 55% 55%, rgba(255,255,255,0.05), transparent 55%)",
   eyebrow: "Hotels · Flights · Weekends · Parks · Cars · Planning",
   bookingHook:
-    "Editorial guides for travelers who read the fine print—then book lodging and flights with live rates and real inventory on the partners you already trust. Every topic, one library.",
+    "Editorial guides for travelers who read the fine print—then book flights with live fares on Skyline Voyager. Every topic, one library.",
 } as const;

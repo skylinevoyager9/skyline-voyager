@@ -7,9 +7,16 @@ const m = getCategoryMeta(category);
 
 export const metadata: Metadata = {
   title: m.shortTitle,
-  description: m.description,
+  description:
+    "Weekend trip ideas with live flight search—compare real-time airfares, book on Skyline Voyager, and plan premium short breaks.",
 };
 
 export default function WeekendTripsHubPage() {
-  return <CategoryHubPage category={category} />;
+  return (
+    <CategoryHubPage
+      category={category}
+      showLiveFlightSearch
+      flightSearchDefaults={{ origin: "LAX", destination: "LAS" }}
+    />
+  );
 }

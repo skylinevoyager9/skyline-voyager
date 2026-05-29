@@ -19,7 +19,7 @@ import {
   getRelatedGuides,
   type GuideCategory,
 } from "@/lib/guides";
-import { HUB_EMPHASIS } from "@/lib/guides/hub-theme";
+import { hubBookingEmphasis } from "@/lib/booking/platform";
 import { hasAnyAffiliateTracking } from "@/lib/partner-links";
 import { site } from "@/lib/site";
 
@@ -60,7 +60,7 @@ export default async function GuidePage({ params }: Props) {
   if (!guide) notFound();
 
   const cat = getCategoryMeta(guide.category);
-  const emphasizePartner = HUB_EMPHASIS[guide.category];
+  const emphasizePartner = hubBookingEmphasis(guide.category);
   const affiliateOn = hasAnyAffiliateTracking();
   const skipIcon = SKIP_ICON[guide.category];
   const toc = getGuideToc(guide.body);

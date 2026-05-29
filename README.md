@@ -53,17 +53,34 @@ You do **not** need traditional “shared hosting” for this stack—Vercel *is
 
 ---
 
-## Environment variables (affiliate links)
+## Flight booking (Duffel + Stripe)
+
+Flights are searched and booked **on this site** (not via affiliate redirects). Copy `.env.example` → `.env.local`.
+
+| Area | Key variables |
+|------|----------------|
+| Duffel | `DUFFEL_API_TOKEN`, `DUFFEL_MODE` (`test` \| `live`) |
+| Pricing | `FLIGHT_MARKUP_PERCENT`, optional min/max caps |
+| Owner | `OWNER_PRICING_KEY` — private URL `?owner=…` to publish live service fee |
+| Stripe | `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` |
+| Persistence (Vercel) | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
+| Email | `RESEND_API_KEY`, `CONTACT_TO_EMAIL` — booking confirmations |
+
+**Routes:** `/flights/search` · `/flights/book` · `/flights/lookup`
+
+**Go live:** use `duffel_live_` + `DUFFEL_MODE=live`, `sk_live_` + `pk_live_`, fund Duffel balance, configure Stripe webhook, set Production env on Vercel, redeploy.
+
+---
+
+## Environment variables (optional affiliate links)
 
 | Name | Purpose |
 |------|---------|
-| `NEXT_PUBLIC_FLIGHTS_AFFILIATE_URL` | Flight search / OTA tracking URL |
-| `NEXT_PUBLIC_BOOKING_AFFILIATE_URL` | Hotels / booking partner |
 | `NEXT_PUBLIC_CAR_RENTAL_AFFILIATE_URL` | Car rental partner |
 | `NEXT_PUBLIC_VIATOR_AFFILIATE_URL` | Viator |
 | `NEXT_PUBLIC_GETYOURGUIDE_AFFILIATE_URL` | GetYourGuide |
 
-Copy `.env.example` → `.env.local` for local dev; set the same keys in **Vercel → Settings → Environment Variables** for production. If unset, buttons use public homepages (no commission). Redeploy after changes.
+Hotels are editorial-only on this site. Redeploy after env changes.
 
 ---
 
@@ -83,6 +100,7 @@ Copy `.env.example` → `.env.local` for local dev; set the same keys in **Verce
 | `/flights`, `/hotels`, `/weekend-trips`, `/national-parks`, `/car-rentals`, `/travel-planning` | Topic hubs |
 | `/guides` | All guides + category filters (`?cat=flights`, etc.) |
 | `/guides/[slug]` | Article |
+| `/flights/search`, `/flights/book`, `/flights/lookup` | Duffel search, checkout, booking lookup |
 | `/about`, `/contact`, `/legal`, `/privacy`, `/terms`, `/affiliate-disclosure` | Company & legal |
 | `/sitemap.xml`, `/robots.txt` | SEO |
 

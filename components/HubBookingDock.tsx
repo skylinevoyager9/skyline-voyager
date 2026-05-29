@@ -1,18 +1,12 @@
 import Link from "next/link";
+import { FlightsPartnerLink } from "@/components/FlightsPartnerLink";
 import { PartnerOutboundLink } from "@/components/PartnerOutboundLink";
-import {
-  type PartnerKey,
-  isAffiliateLink,
-  neutralPartnerCtaCopy,
-} from "@/lib/partner-links";
+import { visiblePartnerKeys } from "@/lib/booking/platform";
+import { flightsPrimaryCtaCopy } from "@/lib/flights/duffel-copy";
+import { type PartnerKey, isAffiliateLink, neutralPartnerCtaCopy } from "@/lib/partner-links";
+import type { ReactNode } from "react";
 
-const ORDER: PartnerKey[] = [
-  "flights",
-  "booking",
-  "cars",
-  "viator",
-  "getyourguide",
-];
+const ORDER: PartnerKey[] = visiblePartnerKeys();
 
 const PILL: Record<PartnerKey, { emoji: string; short: string }> = {
   flights: { emoji: "✈", short: "Flights" },
@@ -57,10 +51,51 @@ type Props = {
   variant?: "dark" | "light";
 };
 
+function PrimaryPartnerCta({
+  partner,
+  className,
+  children,
+}: {
+  partner: PartnerKey;
+  className: string;
+  children: ReactNode;
+}) {
+  if (partner === "flights") {
+    return <FlightsPartnerLink className={className}>{children}</FlightsPartnerLink>;
+  }
+  return (
+    <PartnerOutboundLink partner={partner} className={className}>
+      {children}
+    </PartnerOutboundLink>
+  );
+}
+
+function SecondaryPartnerCta({
+  partner,
+  className,
+  children,
+}: {
+  partner: PartnerKey;
+  className: string;
+  children: ReactNode;
+}) {
+  if (partner === "flights") {
+    return <FlightsPartnerLink className={className}>{children}</FlightsPartnerLink>;
+  }
+  return (
+    <PartnerOutboundLink partner={partner} className={className}>
+      {children}
+    </PartnerOutboundLink>
+  );
+}
+
 export function HubBookingDock({ primary, variant = "dark" }: Props) {
-  const copy = isAffiliateLink(primary)
-    ? PRIMARY_LINE[primary]
-    : neutralPartnerCtaCopy(primary);
+  const copy =
+    primary === "flights"
+      ? flightsPrimaryCtaCopy()
+      : isAffiliateLink(primary)
+        ? PRIMARY_LINE[primary]
+        : neutralPartnerCtaCopy(primary);
   const others = ORDER.filter((k) => k !== primary);
   const isLight = variant === "light";
 
@@ -85,7 +120,7 @@ export function HubBookingDock({ primary, variant = "dark" }: Props) {
             {copy.sub}
           </p>
 
-          <PartnerOutboundLink
+          <PrimaryPartnerCta
             partner={primary}
             className="mt-6 flex min-h-[58px] w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-amber-100 via-stone-100 to-amber-50 px-6 py-4 text-base font-bold text-slate-900 shadow-md ring-1 ring-amber-300/40 transition hover:from-amber-50 hover:via-white hover:to-amber-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
           >
@@ -96,7 +131,7 @@ export function HubBookingDock({ primary, variant = "dark" }: Props) {
             <span className="text-lg text-amber-800/90" aria-hidden>
               →
             </span>
-          </PartnerOutboundLink>
+          </PrimaryPartnerCta>
 
           <div className="mt-5">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-stone-500">
@@ -104,14 +139,14 @@ export function HubBookingDock({ primary, variant = "dark" }: Props) {
             </p>
             <div className="mt-2 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {others.map((key) => (
-                <PartnerOutboundLink
+                <SecondaryPartnerCta
                   key={key}
                   partner={key}
                   className="inline-flex shrink-0 items-center gap-2 rounded-full border border-stone-200 bg-stone-50 px-4 py-2.5 text-sm font-semibold text-stone-800 transition hover:border-amber-400/50 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60"
                 >
                   <span aria-hidden>{PILL[key].emoji}</span>
                   {PILL[key].short}
-                </PartnerOutboundLink>
+                </SecondaryPartnerCta>
               ))}
             </div>
           </div>
@@ -157,7 +192,7 @@ export function HubBookingDock({ primary, variant = "dark" }: Props) {
           {copy.sub}
         </p>
 
-        <PartnerOutboundLink
+        <PrimaryPartnerCta
           partner={primary}
           className="mt-6 flex min-h-[58px] w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-amber-100 via-stone-100 to-amber-50 px-6 py-4 text-base font-bold text-slate-900 shadow-lg ring-1 ring-amber-400/35 transition hover:from-amber-50 hover:via-white hover:to-amber-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
         >
@@ -168,7 +203,7 @@ export function HubBookingDock({ primary, variant = "dark" }: Props) {
           <span className="text-lg text-amber-800/90" aria-hidden>
             →
           </span>
-        </PartnerOutboundLink>
+        </PrimaryPartnerCta>
 
         <div className="mt-5">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-white/50">
@@ -176,7 +211,7 @@ export function HubBookingDock({ primary, variant = "dark" }: Props) {
           </p>
           <div className="mt-2 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {others.map((key) => (
-              <PartnerOutboundLink
+              <SecondaryPartnerCta
                 key={key}
                 partner={key}
                 className="inline-flex shrink-0 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:border-amber-200/40 hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-200/60"
@@ -185,7 +220,7 @@ export function HubBookingDock({ primary, variant = "dark" }: Props) {
                   {PILL[key].emoji}
                 </span>
                 {PILL[key].short}
-              </PartnerOutboundLink>
+              </SecondaryPartnerCta>
             ))}
           </div>
         </div>

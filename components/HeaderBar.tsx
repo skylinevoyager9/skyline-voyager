@@ -8,9 +8,9 @@ import { DESTINATION_META } from "@/lib/guides";
 import { CATEGORY_META } from "@/lib/guides/types";
 import { site } from "@/lib/site";
 
-const primary = [
+const PRIMARY_NAV = [
   { href: "/hotels", label: "Hotels & stays" },
-  { href: "/flights", label: "Flights" },
+  { href: "/flights", label: "Flights", flights: true },
   { href: "/weekend-trips", label: "Weekends" },
   { href: "/national-parks", label: "Parks" },
   { href: "/car-rentals", label: "Cars" },
@@ -25,8 +25,16 @@ const secondary = [
   { href: "/legal", label: "Legal" },
 ];
 
-export function HeaderBar() {
+type HeaderBarProps = {
+  /** `/flights/search` when Duffel is configured, else `/flights`. */
+  flightsHref?: string;
+};
+
+export function HeaderBar({ flightsHref = "/flights" }: HeaderBarProps) {
   const [open, setOpen] = useState(false);
+  const primary = PRIMARY_NAV.map((item) =>
+    item.flights ? { href: flightsHref, label: item.label } : { href: item.href, label: item.label },
+  );
 
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-surface)]/95 backdrop-blur-md">
@@ -151,7 +159,7 @@ export function HeaderBar() {
             {CATEGORY_META.map((c) => (
               <Link
                 key={c.id}
-                href={c.path}
+                href={c.id === "flights" ? flightsHref : c.path}
                 className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--color-ink-muted)] hover:bg-black/[0.04] hover:text-[var(--color-ink)]"
                 onClick={() => setOpen(false)}
               >

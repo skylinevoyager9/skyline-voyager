@@ -1,5 +1,9 @@
 import Link from "next/link";
+import { FlightsPartnerLink } from "@/components/FlightsPartnerLink";
 import { PartnerOutboundLink } from "@/components/PartnerOutboundLink";
+import { flightsPrimaryCtaCopy } from "@/lib/flights/duffel-copy";
+import { visiblePartnerKeys } from "@/lib/booking/platform";
+import { shouldUseDuffelFlightSearch } from "@/lib/flights/links";
 import {
   type PartnerKey,
   hasAnyAffiliateTracking,
@@ -22,13 +26,7 @@ type StripProps = {
   surface?: "default" | "library";
 };
 
-const ALL: PartnerKey[] = [
-  "flights",
-  "booking",
-  "cars",
-  "viator",
-  "getyourguide",
-];
+const ALL: PartnerKey[] = visiblePartnerKeys();
 
 const MEGA: Record<
   PartnerKey,
@@ -175,37 +173,50 @@ function CtaTile({
           soft: "border border-slate-200 bg-slate-50 text-slate-800 hover:bg-white hover:border-teal-400 hover:shadow-sm focus-visible:ring-teal-500",
         }[t.variant];
 
+  const tileClass = `group flex min-h-[5.5rem] flex-col justify-center gap-0.5 rounded-2xl px-4 py-4 text-left shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${styles}`;
+  const subLine =
+    partner === "flights" && shouldUseDuffelFlightSearch()
+      ? "Live search on Skyline Voyager"
+      : displaySub;
+
+  const inner = (
+    <>
+      <span className="flex items-center gap-2">
+        <span
+          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg shadow-sm ring-1 ${
+            tone === "prestige"
+              ? "bg-white ring-stone-200/80"
+              : "bg-white ring-black/5"
+          }`}
+          aria-hidden
+        >
+          {t.icon}
+        </span>
+        <span className="font-display text-base font-bold leading-tight group-hover:underline group-hover:decoration-2 group-hover:underline-offset-2">
+          {headline}
+        </span>
+      </span>
+      <span
+        className={`pl-11 text-xs font-medium leading-snug ${
+          tone === "prestige"
+            ? "text-stone-600 group-hover:text-stone-800"
+            : "text-slate-600 group-hover:text-slate-800"
+        }`}
+      >
+        {subLine}
+      </span>
+    </>
+  );
+
   return (
     <li className="min-w-0">
-      <PartnerOutboundLink
-        partner={partner}
-        className={`group flex min-h-[5.5rem] flex-col justify-center gap-0.5 rounded-2xl px-4 py-4 text-left shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${styles}`}
-      >
-        <span className="flex items-center gap-2">
-          <span
-            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg shadow-sm ring-1 ${
-              tone === "prestige"
-                ? "bg-white ring-stone-200/80"
-                : "bg-white ring-black/5"
-            }`}
-            aria-hidden
-          >
-            {t.icon}
-          </span>
-          <span className="font-display text-base font-bold leading-tight group-hover:underline group-hover:decoration-2 group-hover:underline-offset-2">
-            {headline}
-          </span>
-        </span>
-        <span
-          className={`pl-11 text-xs font-medium leading-snug ${
-            tone === "prestige"
-              ? "text-stone-600 group-hover:text-stone-800"
-              : "text-slate-600 group-hover:text-slate-800"
-          }`}
-        >
-          {displaySub}
-        </span>
-      </PartnerOutboundLink>
+      {partner === "flights" ? (
+        <FlightsPartnerLink className={tileClass}>{inner}</FlightsPartnerLink>
+      ) : (
+        <PartnerOutboundLink partner={partner} className={tileClass}>
+          {inner}
+        </PartnerOutboundLink>
+      )}
     </li>
   );
 }
@@ -224,25 +235,33 @@ export function GuidePartnerStrip({
   const prestige = MEGA_PRESTIGE[emphasizePartner];
   const neutral = neutralPartnerCtaCopy(emphasizePartner);
 
-  const mega = !isAffiliateLink(emphasizePartner)
-    ? {
-        emoji: megaBase.emoji,
-        title: neutral.title,
-        sub: neutral.sub,
-      }
-    : tone === "prestige"
+  const duffelFlights =
+    emphasizePartner === "flights" && shouldUseDuffelFlightSearch();
+  const duffelCopy = duffelFlights ? flightsPrimaryCtaCopy() : null;
+
+  const mega = duffelCopy
+    ? { emoji: megaBase.emoji, title: duffelCopy.title, sub: duffelCopy.sub }
+    : !isAffiliateLink(emphasizePartner)
       ? {
           emoji: megaBase.emoji,
-          title: prestige.title,
-          sub: prestige.sub,
+          title: neutral.title,
+          sub: neutral.sub,
         }
-      : megaBase;
+      : tone === "prestige"
+        ? {
+            emoji: megaBase.emoji,
+            title: prestige.title,
+            sub: prestige.sub,
+          }
+        : megaBase;
 
-  const megaLabel = !isAffiliateLink(emphasizePartner)
-    ? "Compare on partner site"
-    : tone === "prestige"
-      ? MEGA_LABEL_PRESTIGE[emphasizePartner]
-      : MEGA_LABEL[emphasizePartner];
+  const megaLabel = duffelFlights
+    ? "Search on Skyline Voyager"
+    : !isAffiliateLink(emphasizePartner)
+      ? "Compare on partner site"
+      : tone === "prestige"
+        ? MEGA_LABEL_PRESTIGE[emphasizePartner]
+        : MEGA_LABEL[emphasizePartner];
 
   const gridPartners = ALL.filter((k) => k !== emphasizePartner);
 
@@ -351,23 +370,37 @@ export function GuidePartnerStrip({
             >
               {megaLabel}
             </p>
-            <PartnerOutboundLink
-              partner={emphasizePartner}
-              className={megaBtnClass}
-            >
-              <span className="text-2xl sm:text-3xl" aria-hidden>
-                {mega.emoji}
-              </span>
-              <span className="flex flex-col sm:items-start">
-                <span className="font-display text-lg font-bold sm:text-xl">
-                  {mega.title}
+            {emphasizePartner === "flights" ? (
+              <FlightsPartnerLink className={megaBtnClass}>
+                <span className="text-2xl sm:text-3xl" aria-hidden>
+                  {mega.emoji}
                 </span>
-                <span className={megaSubClass}>{mega.sub}</span>
-              </span>
-              <span className={arrowClass} aria-hidden>
-                →
-              </span>
-            </PartnerOutboundLink>
+                <span className="flex flex-col sm:items-start">
+                  <span className="font-display text-lg font-bold sm:text-xl">
+                    {mega.title}
+                  </span>
+                  <span className={megaSubClass}>{mega.sub}</span>
+                </span>
+                <span className={arrowClass} aria-hidden>
+                  →
+                </span>
+              </FlightsPartnerLink>
+            ) : (
+              <PartnerOutboundLink partner={emphasizePartner} className={megaBtnClass}>
+                <span className="text-2xl sm:text-3xl" aria-hidden>
+                  {mega.emoji}
+                </span>
+                <span className="flex flex-col sm:items-start">
+                  <span className="font-display text-lg font-bold sm:text-xl">
+                    {mega.title}
+                  </span>
+                  <span className={megaSubClass}>{mega.sub}</span>
+                </span>
+                <span className={arrowClass} aria-hidden>
+                  →
+                </span>
+              </PartnerOutboundLink>
+            )}
           </div>
 
           <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

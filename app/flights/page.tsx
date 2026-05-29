@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CategoryHubPage } from "@/components/CategoryHubPage";
+import { DuffelSearchBanner } from "@/components/flights/DuffelSearchBanner";
 import { getCategoryMeta } from "@/lib/guides";
 
 const category = "flights" as const;
@@ -11,5 +12,10 @@ export const metadata: Metadata = {
 };
 
 export default function FlightsHubPage() {
-  return <CategoryHubPage category={category} />;
+  return (
+    <>
+      <DuffelSearchBanner />
+      <CategoryHubPage category={category} />
+    </>
+  );
 }

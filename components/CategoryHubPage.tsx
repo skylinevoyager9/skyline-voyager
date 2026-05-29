@@ -1,9 +1,12 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { FlightSearchCard } from "@/components/flights/FlightSearchCard";
 import { GuidePartnerStrip } from "@/components/GuidePartnerStrip";
 import { HubBookingDock } from "@/components/HubBookingDock";
+import { hubBookingEmphasis, visiblePartnerKeys } from "@/lib/booking/platform";
+import { shouldUseDuffelFlightSearch } from "@/lib/flights/links";
 import { GuideCardHero } from "@/components/GuideCardHero";
-import { HUB_EMPHASIS, HUB_THEME } from "@/lib/guides/hub-theme";
+import { HUB_THEME } from "@/lib/guides/hub-theme";
 import {
   getCategoryMeta,
   getGuidesByCategory,
@@ -14,14 +17,22 @@ import {
 export function CategoryHubPage({
   category,
   prePartnerSlot,
+  showLiveFlightSearch = false,
+  flightSearchDefaults,
 }: {
   category: GuideCategory;
   /** Shown above the partner strip (e.g. hotels hub compliance / future embeds). */
   prePartnerSlot?: ReactNode;
+  /** Hero flight search card → `/flights/search` with live Duffel fares when configured. */
+  showLiveFlightSearch?: boolean;
+  flightSearchDefaults?: { origin?: string; destination?: string };
 }) {
   const meta = getCategoryMeta(category);
   const theme = HUB_THEME[category];
-  const emphasis = HUB_EMPHASIS[category];
+  const emphasis = hubBookingEmphasis(category);
+  const liveSearch = shouldUseDuffelFlightSearch();
+  const showFlightCard =
+    liveSearch && (showLiveFlightSearch || !visiblePartnerKeys().includes("booking"));
   const posts = getGuidesByCategory(category).sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   );
@@ -74,8 +85,29 @@ export function CategoryHubPage({
             {meta.title}
           </h1>
           <p className="mt-6 max-w-2xl text-base font-light leading-relaxed text-white/88 sm:text-lg">
-            {theme.bookingHook}
+            {showFlightCard
+              ? "Search live airfares and book flights on Skyline Voyager. Stay guides are editorial only—checkout is flight booking via Duffel, not hotel marketplaces."
+              : theme.bookingHook}
           </p>
+
+          {showFlightCard ? (
+            <FlightSearchCard
+              className="mt-10 max-w-4xl"
+              liveSearch={liveSearch}
+              title={
+                category === "weekends"
+                  ? "Weekend flights — live fares"
+                  : "Live flight search"
+              }
+              subtitle={
+                category === "weekends"
+                  ? "Friday–Sunday routes with real-time pricing. Return date prefilled for a typical 2-night trip."
+                  : "Compare real-time fares, then book on Skyline Voyager."
+              }
+              defaultOrigin={flightSearchDefaults?.origin ?? "LAX"}
+              defaultDestination={flightSearchDefaults?.destination ?? "LAS"}
+            />
+          ) : null}
 
           <HubBookingDock primary={emphasis} />
         </div>
@@ -179,8 +211,12 @@ export function CategoryHubPage({
           <div className="mb-12 space-y-6">{prePartnerSlot}</div>
         ) : null}
         <GuidePartnerStrip
-          emphasizePartner={emphasis}
-          title="Private search — complete checkout on partner sites"
+          emphasizePartner="flights"
+          title={
+            liveSearch
+              ? "Book flights on Skyline Voyager"
+              : "Private search — complete checkout on partner sites"
+          }
           className="mt-0"
           sectionId="book-trip"
           tone="prestige"

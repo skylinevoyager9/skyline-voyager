@@ -50,7 +50,7 @@ const PAGE_ENTRIES: Omit<SearchItem, "type">[] = [
   },
   {
     title: "How this site works",
-    description: `Research and book stays and flights through trusted partners including Booking.com; checkout on partner sites.`,
+    description: `US travel guides and live flight search—book on Skyline Voyager with Duffel-powered fares.`,
     href: "/about#how-it-works",
     hint: "Company",
   },

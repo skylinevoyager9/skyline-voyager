@@ -1,181 +1,91 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalRelatedLinks } from "@/components/LegalRelatedLinks";
-import { hasAnyAffiliateTracking } from "@/lib/partner-links";
+import { usesDuffelFlightBooking } from "@/lib/booking/platform";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Affiliate Disclosure",
   description:
-    "How Skyline Voyager may earn commissions from partner links—including planned Booking.com and OTA tracking—with FTC-style transparency and checkout on partner sites.",
+    "How Skyline Voyager handles flight booking (Duffel), pricing, and optional partner links for cars and experiences.",
 };
 
 export default function AffiliateDisclosurePage() {
-  const affiliateOn = hasAnyAffiliateTracking();
+  const duffelOn = usesDuffelFlightBooking();
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-14 sm:px-6 sm:py-20">
       <h1 className="font-display text-3xl font-semibold text-[var(--color-ink)]">
-        Affiliate Disclosure
+        Affiliate &amp; booking disclosure
       </h1>
       <p className="mt-2 text-sm text-[var(--color-ink-faint)]">
         Last updated: April 9, 2026
       </p>
 
       <section className="mt-10 space-y-4 text-[var(--color-ink-muted)] leading-relaxed">
-        {affiliateOn ? (
-          <p>
-            {site.legalName} (“{site.name},” “we,” “us”) operates{" "}
-            <Link
-              href={site.url}
-              className="font-medium text-[var(--color-accent)] underline-offset-2 hover:underline"
-            >
-              {site.domain}
-            </Link>
-            . Some links on this website are <strong>affiliate links</strong>.
-            If you click an affiliate link and make a qualifying purchase or
-            booking, we may earn a commission or referral fee from the partner.
-            We intend to participate in major hotel and OTA programs—including{" "}
-            <strong>Booking.com</strong> where available—and to label partner
-            links clearly so readers know when a click may support our work.
-          </p>
-        ) : (
-          <>
-            <p>
-              {site.legalName} (“{site.name},” “we,” “us”) operates{" "}
-              <Link
-                href={site.url}
-                className="font-medium text-[var(--color-accent)] underline-offset-2 hover:underline"
-              >
-                {site.domain}
-              </Link>{" "}
-              as a <strong>booking-friendly travel research site</strong>: we
-              publish editorial guides, then link to trusted partners (including{" "}
-              <strong>Booking.com</strong> for hotel and vacation-rental search)
-              so you can complete checkout on the brand you choose.
-            </p>
-            <p>
-              <strong>Tracked affiliate links are not active on this site right
-              now,</strong> so we do not yet earn a commission when you use
-              outbound links. We <strong>intend to add</strong> partner tracking
-              links—including for hotel and booking platforms such as{" "}
-              <strong>Booking.com</strong> via networks like Awin—in line with
-              each program&apos;s brand-safety and disclosure requirements. When
-              tracking goes live, we will update this page and surface short
-              disclosures near outbound booking buttons where appropriate.
-            </p>
-          </>
-        )}
         <p>
-          <strong>You do not pay extra</strong> because you used our link. The
-          price you see comes from the merchant or booking platform.
+          {site.legalName} (“{site.name},” “we,” “us”) operates{" "}
+          <Link
+            href={site.url}
+            className="font-medium text-[var(--color-accent)] underline-offset-2 hover:underline"
+          >
+            {site.domain}
+          </Link>
+          . This page explains how money flows when you use our site.
         </p>
+
+        <h2 className="font-display pt-4 text-xl font-semibold text-[var(--color-ink)]">
+          Flight booking on Skyline Voyager
+        </h2>
         <p>
-          We may participate in programs operated by hotels and online travel
-          agencies, airlines and flight search platforms, tour and activity
-          marketplaces, rental car companies, and similar travel-related
-          services. Specific partners may change over time.
-        </p>
-        <p>
-          We publish guides we believe are useful.{" "}
-          {affiliateOn ? (
+          {duffelOn ? (
             <>
-              Affiliate relationships can influence <em>which</em> partners we
-              link to, but they do not change our commitment to honest,
-              reader-first explanations (fees, timing, tradeoffs) in our
-              editorial content.
+              We offer <strong>live flight search and booking</strong> powered by
+              Duffel. You search on our site, pay at checkout (Stripe), and we place
+              the order with the airline through Duffel. You see one{" "}
+              <strong>total price</strong> before you pay; that total includes our
+              agency service fee on top of the fare we pay the airline. We do not add
+              separate fees at the last step of checkout.
             </>
           ) : (
             <>
-              If we add monetized partner links later, those relationships could
-              influence <em>which</em> partners we link to; they will not change
-              our commitment to honest, reader-first explanations (fees, timing,
-              tradeoffs) in our editorial content.
+              When flight booking is enabled, checkout happens on Skyline Voyager
+              using aviation inventory from Duffel—not on Booking.com or other OTAs.
             </>
           )}
         </p>
-      </section>
-
-      <section className="mt-10">
-        <h2 className="font-display text-xl font-semibold text-[var(--color-ink)]">
-          FTC transparency
-        </h2>
-        <p className="mt-3 text-[var(--color-ink-muted)] leading-relaxed">
-          The Federal Trade Commission (FTC) expects clear disclosure of
-          material connections. We place this disclosure on our site and
-          summarize the relationship near recommendations where it makes sense.
-          If you ever feel a page is unclear, please{" "}
-          <Link
-            href="/contact"
-            className="font-medium text-[var(--color-accent)] underline-offset-2 hover:underline"
-          >
-            contact us
-          </Link>
-          .
+        <p>
+          We are not the airline. Tickets are issued per the fare rules shown at
+          booking time. Refunds and changes follow airline and fare conditions.
         </p>
-      </section>
 
-      <section className="mt-10">
-        <h2 className="font-display text-xl font-semibold text-[var(--color-ink)]">
-          Not travel agency services
+        <h2 className="font-display pt-4 text-xl font-semibold text-[var(--color-ink)]">
+          Hotels and stays
         </h2>
-        <p className="mt-3 text-[var(--color-ink-muted)] leading-relaxed">
-          {site.name} provides general information and links to third-party
-          sites. We do not operate as your travel agent, we do not hold your
-          funds for bookings, and we do not control partner cancellation or
-          refund policies. Always read the terms on the provider’s checkout page.
+        <p>
+          Our hotel, neighborhood, and lodging articles are{" "}
+          <strong>editorial only</strong>. We do <strong>not</strong> link to
+          Booking.com, Awin hotel programs, or other stay marketplaces for checkout.
+          Plan where to stay using our guides; book flights here when you are ready.
         </p>
-      </section>
 
-      <section className="mt-10">
-        <h2 className="font-display text-xl font-semibold text-[var(--color-ink)]">
-          Questions
+        <h2 className="font-display pt-4 text-xl font-semibold text-[var(--color-ink)]">
+          Other partner links
         </h2>
-        <p className="mt-3 text-[var(--color-ink-muted)] leading-relaxed">
-          Email questions about this disclosure through our{" "}
-          <Link
-            href="/contact"
-            className="font-medium text-[var(--color-accent)] underline-offset-2 hover:underline"
-          >
-            contact page
-          </Link>
-          .
+        <p>
+          Some pages may link to car rental or tour partners in a new tab. If those
+          links are affiliate-tracked in the future, we may earn a commission at no
+          extra cost to you. Those programs are separate from flight booking on this
+          site.
         </p>
-      </section>
-
-      <section className="mt-10">
-        <h2 className="font-display text-xl font-semibold text-[var(--color-ink)]">
-          Privacy &amp; site terms
-        </h2>
-        <p className="mt-3 text-[var(--color-ink-muted)] leading-relaxed">
-          How we handle data is described in our{" "}
-          <Link
-            href="/privacy"
-            className="font-medium text-[var(--color-accent)] underline-offset-2 hover:underline"
-          >
-            Privacy Policy
-          </Link>
-          . Rules for using the site are in our{" "}
-          <Link
-            href="/terms"
-            className="font-medium text-[var(--color-accent)] underline-offset-2 hover:underline"
-          >
-            Terms &amp; Conditions
-          </Link>
-          .
+        <p>
+          <strong>You do not pay extra</strong> because you used our link. The price
+          you see at checkout is what we charge for flights on this site.
         </p>
-      </section>
-
-      <section className="mt-10">
-        <h2 className="font-display text-xl font-semibold text-[var(--color-ink)]">
-          Secure connections (HTTPS)
-        </h2>
-        <p className="mt-3 text-[var(--color-ink-muted)] leading-relaxed">
-          We intend for {site.domain} to be served over HTTPS in production.
-          Many third-party affiliate programs require a secure public site and
-          secure outbound tracking links; configure TLS with your hosting
-          provider (for example, the default setup on Vercel) before you point
-          your production domain at this project.
+        <p>
+          We publish guides we believe are useful. Commercial relationships do not
+          change our commitment to honest explanations about fees, timing, and
+          tradeoffs in editorial content.
         </p>
       </section>
 

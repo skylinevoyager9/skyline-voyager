@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { hasAnyAffiliateTracking } from "@/lib/partner-links";
+import { usesDuffelFlightBooking } from "@/lib/booking/platform";
 import { site } from "@/lib/site";
 
 type Props = {
@@ -8,37 +8,28 @@ type Props = {
   variant?: "compact" | "inline";
 };
 
-/**
- * Short notice for pages that link to booking partners—commission language only
- * when tracked affiliate URLs are configured.
- */
 export function AffiliateDisclosureBlock({
   className = "",
   variant = "compact",
 }: Props) {
-  const tracked = hasAnyAffiliateTracking();
+  const duffelOn = usesDuffelFlightBooking();
 
-  const body = tracked ? (
+  const body = duffelOn ? (
     <>
-      {site.name} may earn a commission if you use certain links and complete a
-      qualifying booking or purchase.{" "}
-      <strong className="font-semibold text-stone-800">
-        You are not charged extra
-      </strong>{" "}
-      for using our links.
+      <strong className="font-semibold text-stone-800">Flights:</strong> search and
+      checkout on {site.name} with live fares (Duffel). We may earn a service margin
+      on the fare; the price shown is what you pay at checkout.{" "}
+      <strong className="font-semibold text-stone-800">Hotels:</strong> guides only—no
+      Booking.com or OTA checkout links.
     </>
   ) : (
     <>
-      Outbound links open partner sites (for example hotels or flights) in a new
-      tab so you can compare prices and policies.{" "}
-      <strong className="font-semibold text-stone-800">
-        Tracked affiliate links are not active on this site yet;
-      </strong>{" "}
-      when they are, our disclosure will describe how that works.
+      Flight booking opens on {site.name} when configured. Hotel guides are editorial
+      and do not link to Booking.com.
     </>
   );
 
-  const noteLabel = tracked ? "Affiliate note:" : "Partner links:";
+  const noteLabel = "Booking & partners:";
 
   if (variant === "inline") {
     return (
@@ -48,7 +39,7 @@ export function AffiliateDisclosureBlock({
           href="/affiliate-disclosure"
           className="font-semibold text-amber-900 underline decoration-amber-900/30 underline-offset-2 hover:decoration-amber-900"
         >
-          {tracked ? "Full disclosure" : "Read our disclosure"}
+          Full disclosure
         </Link>
         .
       </p>
@@ -68,9 +59,7 @@ export function AffiliateDisclosureBlock({
           href="/affiliate-disclosure"
           className="font-semibold text-amber-900 underline decoration-amber-900/30 underline-offset-2 hover:decoration-amber-900"
         >
-          {tracked
-            ? "Read our affiliate disclosure"
-            : "Partner & affiliate disclosure"}
+          Read our disclosure
         </Link>
         .
       </p>

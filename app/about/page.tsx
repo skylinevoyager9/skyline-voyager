@@ -5,7 +5,7 @@ import { site } from "@/lib/site";
 export const metadata: Metadata = {
   title: "About",
   description:
-    `${site.name} (${site.legalName}) helps premium travelers research and book stays and flights through trusted partners including Booking.com—editorial guides first, checkout on partner sites.`,
+    `${site.name} (${site.legalName}) publishes US travel guides and live flight booking on Skyline Voyager via Duffel.`,
 };
 
 const HERO_GLOW =
@@ -62,22 +62,18 @@ export default function AboutPage() {
               How this site works
             </h2>
             <p className="mt-3 text-stone-700 leading-relaxed">
-              We help premium travelers <strong className="text-stone-900">research</strong>{" "}
-              destinations and cabin or room choices, then{" "}
-              <strong className="text-stone-900">book flights, hotels, and stays</strong>{" "}
-              through trusted booking partners—including{" "}
-              <strong className="text-stone-900">Booking.com</strong> for hotel and
-              vacation-rental search when you use our stay tools. Editorial guides
-              explain fees, timing, and tradeoffs;{" "}
-              <strong className="text-stone-900">checkout always happens on the partner</strong>{" "}
-              you choose (new tab). We are working toward formal affiliate
-              relationships with major booking platforms and use tracking links only
-              in line with their brand-safety and disclosure rules—see our{" "}
+              We help travelers <strong className="text-stone-900">research</strong>{" "}
+              destinations in our guides, then{" "}
+              <strong className="text-stone-900">book flights on Skyline Voyager</strong>{" "}
+              with live fares powered by Duffel. You search, pay on our site (Stripe in
+              production), and we place the airline order. Hotel and stay articles are{" "}
+              <strong className="text-stone-900">editorial only</strong>—we do not link
+              to Booking.com or other hotel booking sites. See our{" "}
               <Link
                 href="/affiliate-disclosure"
                 className="font-bold text-amber-900 underline decoration-amber-900/30 underline-offset-2 hover:decoration-amber-900"
               >
-                affiliate disclosure
+                disclosure
               </Link>
               .
             </p>
@@ -98,26 +94,15 @@ export default function AboutPage() {
             hidden agendas in the writing.
           </p>
           <p className="mt-5 text-stone-700 leading-relaxed">
-            This site is supported in part through affiliate relationships with
-            booking platforms, flight search tools, and experience providers.
-            When you use our links, we may receive a commission.{" "}
-            <strong className="text-stone-900">
-              That does not increase the price you pay.
-            </strong>{" "}
-            Read the full details on our{" "}
-            <Link
-              href="/affiliate-disclosure"
-              className="font-bold text-amber-900 underline decoration-amber-900/30 underline-offset-2 hover:decoration-amber-900"
-            >
-              affiliate disclosure
-            </Link>{" "}
-            page.
+            Optional outbound links for cars, tours, or experiences may earn a
+            commission when configured.{" "}
+            <strong className="text-stone-900">Flight bookings</strong> are handled
+            on this site, not via third-party OTAs.
           </p>
           <p className="mt-5 text-stone-700 leading-relaxed">
-            We are <strong className="text-stone-900">not a travel agency</strong>{" "}
-            and we do not issue airline tickets or take payment for your bookings.
-            You complete checkout on the partner site you choose—always in a new
-            tab when you use our tools from this site.
+            We are a <strong className="text-stone-900">publisher and booking platform</strong>{" "}
+            for flights only—not a full-service travel agency for hotels. Tickets are
+            fulfilled through our aviation API partner (Duffel).
           </p>
 
           <section
@@ -133,11 +118,10 @@ export default function AboutPage() {
             </h2>
             <p className="mt-3 text-stone-700 leading-relaxed">
               {site.legalName} is a US-based editorial travel publisher. Primary
-              focus: <strong className="text-stone-900">domestic lodging and trips</strong>{" "}
-              for business and premium leisure readers. We surface live search and
-              booking through partner programs where disclosed;{" "}
-              <strong className="text-stone-900">checkout always happens on the partner</strong>
-              . For media kits, verification, or partnership questions, email{" "}
+              focus: <strong className="text-stone-900">US trips and live flight booking</strong>{" "}
+              for business and premium leisure readers. Hotel content is editorial;
+              flights book on Skyline Voyager. For media kits, verification, or partnership
+              questions, email{" "}
               <a
                 href={`mailto:${site.email}?subject=Partnership%20inquiry`}
                 className="font-bold text-amber-900 underline decoration-amber-900/30 underline-offset-2 hover:decoration-amber-900"

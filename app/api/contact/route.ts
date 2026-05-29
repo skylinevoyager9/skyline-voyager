@@ -1,3 +1,4 @@
+import { applyRateLimit } from "@/lib/api/rate-limit";
 import { site } from "@/lib/site";
 
 const MAX_NAME = 120;
@@ -16,6 +17,9 @@ function escapeHtml(s: string): string {
 }
 
 export async function POST(req: Request) {
+  const limited = applyRateLimit(req, "contact", 8, 60_000);
+  if (limited) return limited;
+
   const apiKey = process.env.RESEND_API_KEY?.trim();
   if (!apiKey) {
     return Response.json(

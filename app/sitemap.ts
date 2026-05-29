@@ -14,6 +14,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const hubs = [
     "/flights",
+    "/flights/search",
+    "/flights/book",
+    "/flights/lookup",
     "/hotels",
     "/weekend-trips",
     "/national-parks",
