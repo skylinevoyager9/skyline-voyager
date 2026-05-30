@@ -1,10 +1,13 @@
 import {
   duffelWebhookSecretLooksCorrupted,
   getDuffelSignatureHeader,
-  verifyDuffelWebhookSignatureAny,
+  verifyDuffelWebhookRequest,
 } from "@/lib/duffel/webhook-signature";
 import { handleDuffelWebhookEvent, type DuffelWebhookEvent } from "@/lib/duffel/webhook-events";
-import { listDuffelWebhookSecrets } from "@/lib/duffel/webhook-secret-store";
+import {
+  fingerprintDuffelWebhookSecret,
+  listDuffelWebhookSecrets,
+} from "@/lib/duffel/webhook-secret-store";
 import { reportServerError } from "@/lib/observability/report-error";
 
 export const runtime = "nodejs";
@@ -25,15 +28,26 @@ export async function POST(req: Request) {
 
   const rawBody = Buffer.from(await req.arrayBuffer());
   const signature = getDuffelSignatureHeader(req);
+  const contentEncoding = req.headers.get("content-encoding");
 
-  if (!verifyDuffelWebhookSignatureAny(secrets, rawBody, signature)) {
+  const verifiedBody = verifyDuffelWebhookRequest(
+    secrets,
+    rawBody,
+    signature,
+    contentEncoding,
+  );
+
+  if (!verifiedBody) {
     const corrupted = secrets.some(duffelWebhookSecretLooksCorrupted);
     reportServerError(new Error("Duffel webhook signature mismatch"), {
       route: "duffel-webhook",
       bodyLength: rawBody.length,
+      contentEncoding: contentEncoding ?? undefined,
       hasSignature: Boolean(signature),
       secretCount: secrets.length,
+      secretFingerprints: secrets.map(fingerprintDuffelWebhookSecret).join(","),
       secretLooksCorrupted: corrupted,
+      bodyLooksGzip: rawBody.length >= 2 && rawBody[0] === 0x1f && rawBody[1] === 0x8b,
     });
     return Response.json(
       {
@@ -41,7 +55,12 @@ export async function POST(req: Request) {
         error: "Invalid signature.",
         hint: corrupted
           ? "Secret may contain spaces instead of '+'. Re-paste or use POST /api/admin/duffel-webhook/sync."
-          : "Secrets do not match this webhook. Use POST /api/admin/duffel-webhook/sync (with Upstash) or recreate in Duffel and update DUFFEL_WEBHOOK_SECRET, then redeploy.",
+          : "Run POST /api/admin/duffel-webhook/sync again, or remove duplicate DUFFEL_WEBHOOK_SECRET if it differs from Upstash.",
+        debug: {
+          bodyLength: rawBody.length,
+          contentEncoding,
+          secretCount: secrets.length,
+        },
       },
       { status: 400 },
     );
@@ -49,7 +68,7 @@ export async function POST(req: Request) {
 
   let event: DuffelWebhookEvent;
   try {
-    event = JSON.parse(rawBody.toString("utf8")) as DuffelWebhookEvent;
+    event = JSON.parse(verifiedBody.toString("utf8")) as DuffelWebhookEvent;
   } catch (err) {
     reportServerError(err, { route: "duffel-webhook" });
     return Response.json({ ok: false, error: "Invalid JSON." }, { status: 400 });

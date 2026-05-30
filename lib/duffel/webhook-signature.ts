@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { gunzipSync, gzipSync } from "node:zlib";
 
 /** Normalize secret pasted from Duffel / Vercel (trim, strip quotes). */
 export function normalizeDuffelWebhookSecret(secret: string): string {
@@ -78,11 +79,46 @@ function hexEqual(a: string, b: string): boolean {
   }
 }
 
-function bodyCandidates(rawBody: Buffer): Buffer[] {
-  const out: Buffer[] = [rawBody];
+function isGzipBytes(buf: Buffer): boolean {
+  return buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b;
+}
+
+/** Raw body variants (gzip / trailing newline) — Duffel signs exact bytes sent on the wire. */
+export function duffelWebhookBodyCandidates(
+  rawBody: Buffer,
+  contentEncoding: string | null,
+): Buffer[] {
+  const seen = new Set<string>();
+  const out: Buffer[] = [];
+  const add = (buf: Buffer) => {
+    if (buf.length === 0) return;
+    const key = buf.toString("base64");
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push(buf);
+  };
+
+  add(rawBody);
   if (rawBody.length > 0 && rawBody[rawBody.length - 1] === 0x0a) {
-    out.push(rawBody.subarray(0, rawBody.length - 1));
+    add(rawBody.subarray(0, rawBody.length - 1));
   }
+
+  const ce = contentEncoding?.toLowerCase() ?? "";
+  const treatAsGzip = ce.includes("gzip") || isGzipBytes(rawBody);
+
+  if (treatAsGzip) {
+    try {
+      add(gunzipSync(rawBody));
+    } catch {
+      /* not gzip or already plain */
+    }
+    try {
+      add(gzipSync(rawBody));
+    } catch {
+      /* ignore */
+    }
+  }
+
   return out;
 }
 
@@ -109,10 +145,28 @@ export function verifyDuffelWebhookSignature(
   const parsed = parseSignatureHeader(signatureHeader);
   if (!parsed) return false;
 
-  for (const payload of bodyCandidates(rawBody)) {
+  for (const payload of duffelWebhookBodyCandidates(rawBody, null)) {
     if (verifyWithPayload(secret, parsed.timestamp, parsed.v1, payload)) return true;
   }
   return false;
+}
+
+/** Try each secret and body variant; returns the body buffer that verified. */
+export function verifyDuffelWebhookRequest(
+  secrets: string[],
+  rawBody: Buffer,
+  signatureHeader: string | null,
+  contentEncoding: string | null,
+): Buffer | null {
+  if (!signatureHeader?.trim() || secrets.length === 0) return null;
+
+  const bodies = duffelWebhookBodyCandidates(rawBody, contentEncoding);
+  for (const body of bodies) {
+    for (const secret of secrets) {
+      if (verifyDuffelWebhookSignature(secret, body, signatureHeader)) return body;
+    }
+  }
+  return null;
 }
 
 /** Try each configured secret (env + Upstash) until one verifies. */
@@ -121,10 +175,7 @@ export function verifyDuffelWebhookSignatureAny(
   rawBody: Buffer,
   signatureHeader: string | null,
 ): boolean {
-  for (const secret of secrets) {
-    if (verifyDuffelWebhookSignature(secret, rawBody, signatureHeader)) return true;
-  }
-  return false;
+  return verifyDuffelWebhookRequest(secrets, rawBody, signatureHeader, null) !== null;
 }
 
 /** True if secret may have been corrupted when pasted (e.g. + → space). */

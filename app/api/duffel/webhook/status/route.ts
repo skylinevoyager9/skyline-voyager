@@ -14,6 +14,7 @@ export async function GET() {
   const secrets = await listDuffelWebhookSecrets();
   const primary = secrets[0] ?? "";
   const envSecret = normalizeDuffelWebhookSecret(process.env.DUFFEL_WEBHOOK_SECRET ?? "");
+  const fingerprints = secrets.map((s) => fingerprintDuffelWebhookSecret(s));
 
   return Response.json({
     ok: true,
@@ -22,6 +23,7 @@ export async function GET() {
       vercelEnv: Boolean(envSecret),
       upstash: isRedisKvConfigured(),
       count: secrets.length,
+      fingerprintsMatch: fingerprints.length <= 1 || new Set(fingerprints).size === 1,
     },
     secretConfigured: secrets.length > 0,
     secretLength: primary.length,
@@ -32,6 +34,7 @@ export async function GET() {
     secretContainsWhitespace: /\s/.test(primary),
     secretEndsWithEquals: primary.endsWith("=="),
     secretFingerprint: primary ? fingerprintDuffelWebhookSecret(primary) : null,
+    secretFingerprints: fingerprints,
     autoSyncAvailable: isRedisKvConfigured() && Boolean(process.env.DUFFEL_WEBHOOK_SETUP_KEY?.trim()),
     hint: hintForStatus(secrets, primary, envSecret),
   });
@@ -54,7 +57,7 @@ function hintForStatus(secrets: string[], primary: string, envSecret: string): s
     return "Using Upstash-stored secret only. If ping fails, POST /api/admin/duffel-webhook/sync.";
   }
   if (secrets.length > 1) {
-    return "Multiple secrets configured (env + Upstash). Verification tries all. If ping fails, run auto-sync.";
+    return "Two different secrets in env vs Upstash — delete DUFFEL_WEBHOOK_SECRET in Vercel (keep Upstash only) or make them identical, redeploy, then ping.";
   }
   return "Secret is set. If ping fails, POST /api/admin/duffel-webhook/sync (recommended) or recreate webhook in Duffel.";
 }
