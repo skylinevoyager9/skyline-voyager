@@ -21,19 +21,29 @@ export async function listDuffelWebhookSecrets(): Promise<string[]> {
     out.push(n);
   };
 
-  add(process.env.DUFFEL_WEBHOOK_SECRET);
+  // Upstash (from auto-sync) is authoritative — try before stale Vercel env.
   if (isRedisKvConfigured()) {
     add(await kvGet(DUFFEL_WEBHOOK_SECRET_KV_KEY));
   }
+  add(process.env.DUFFEL_WEBHOOK_SECRET);
 
   return out;
 }
 
-export async function storeDuffelWebhookSecret(secret: string): Promise<boolean> {
+export async function storeDuffelWebhookSecret(secret: string): Promise<{
+  stored: boolean;
+  roundTripOk: boolean;
+}> {
   const normalized = normalizeDuffelWebhookSecret(secret);
-  if (!normalized) return false;
-  if (!isRedisKvConfigured()) return false;
-  return kvSet(DUFFEL_WEBHOOK_SECRET_KV_KEY, normalized);
+  if (!normalized || !isRedisKvConfigured()) {
+    return { stored: false, roundTripOk: false };
+  }
+  const stored = await kvSet(DUFFEL_WEBHOOK_SECRET_KV_KEY, normalized);
+  if (!stored) return { stored: false, roundTripOk: false };
+  const readBack = normalizeDuffelWebhookSecret(
+    (await kvGet(DUFFEL_WEBHOOK_SECRET_KV_KEY)) ?? "",
+  );
+  return { stored: true, roundTripOk: readBack === normalized };
 }
 
 export async function getPrimaryDuffelWebhookSecret(): Promise<string | null> {

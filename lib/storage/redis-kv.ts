@@ -14,49 +14,43 @@ export function isRedisKvConfigured(): boolean {
   return restConfig() != null;
 }
 
-export async function kvGet(key: string): Promise<string | null> {
+/** Run a Redis command via Upstash REST (avoids URL-encoding corrupting secret values). */
+async function kvCommand(command: (string | number)[]): Promise<unknown> {
   const cfg = restConfig();
   if (!cfg) return null;
-  const res = await fetch(`${cfg.url}/get/${encodeURIComponent(key)}`, {
-    headers: { Authorization: `Bearer ${cfg.token}` },
+  const res = await fetch(cfg.url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${cfg.token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(command),
     cache: "no-store",
   });
   if (!res.ok) return null;
-  const json = (await res.json()) as { result?: string | null };
+  const json = (await res.json()) as { result?: unknown; error?: string };
+  if (json.error) return null;
   return json.result ?? null;
 }
 
+export async function kvGet(key: string): Promise<string | null> {
+  const result = await kvCommand(["GET", key]);
+  if (result === null || result === undefined) return null;
+  return typeof result === "string" ? result : String(result);
+}
+
 export async function kvSet(key: string, value: string): Promise<boolean> {
-  const cfg = restConfig();
-  if (!cfg) return false;
-  const res = await fetch(
-    `${cfg.url}/set/${encodeURIComponent(key)}/${encodeURIComponent(value)}`,
-    {
-      method: "POST",
-      headers: { Authorization: `Bearer ${cfg.token}` },
-    },
-  );
-  return res.ok;
+  const result = await kvCommand(["SET", key, value]);
+  return result === "OK" || result === "ok" || result === true;
 }
 
 export async function kvLpush(key: string, value: string): Promise<boolean> {
-  const cfg = restConfig();
-  if (!cfg) return false;
-  const res = await fetch(`${cfg.url}/lpush/${encodeURIComponent(key)}/${encodeURIComponent(value)}`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${cfg.token}` },
-  });
-  return res.ok;
+  const result = await kvCommand(["LPUSH", key, value]);
+  return typeof result === "number" && result >= 0;
 }
 
 export async function kvLrange(key: string, start: number, end: number): Promise<string[]> {
-  const cfg = restConfig();
-  if (!cfg) return [];
-  const res = await fetch(
-    `${cfg.url}/lrange/${encodeURIComponent(key)}/${start}/${end}`,
-    { headers: { Authorization: `Bearer ${cfg.token}` }, cache: "no-store" },
-  );
-  if (!res.ok) return [];
-  const json = (await res.json()) as { result?: string[] };
-  return json.result ?? [];
+  const result = await kvCommand(["LRANGE", key, start, end]);
+  if (!Array.isArray(result)) return [];
+  return result.map((item) => (typeof item === "string" ? item : String(item)));
 }
