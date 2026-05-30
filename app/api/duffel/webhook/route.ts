@@ -1,11 +1,14 @@
-import { verifyDuffelWebhookSignature } from "@/lib/duffel/webhook-signature";
+import {
+  normalizeDuffelWebhookSecret,
+  verifyDuffelWebhookSignature,
+} from "@/lib/duffel/webhook-signature";
 import { handleDuffelWebhookEvent, type DuffelWebhookEvent } from "@/lib/duffel/webhook-events";
 import { reportServerError } from "@/lib/observability/report-error";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
-  const secret = process.env.DUFFEL_WEBHOOK_SECRET?.trim();
+  const secret = normalizeDuffelWebhookSecret(process.env.DUFFEL_WEBHOOK_SECRET ?? "");
   if (!secret) {
     return Response.json({ ok: false, error: "Duffel webhook not configured." }, { status: 503 });
   }
