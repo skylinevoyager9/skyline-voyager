@@ -1,30 +1,60 @@
-import { normalizeDuffelWebhookSecret } from "@/lib/duffel/webhook-signature";
+import {
+  duffelWebhookSecretLooksCorrupted,
+  normalizeDuffelWebhookSecret,
+} from "@/lib/duffel/webhook-signature";
+import { fingerprintDuffelWebhookSecret, listDuffelWebhookSecrets } from "@/lib/duffel/webhook-secret-store";
+import { getDuffelWebhookPublicUrl } from "@/lib/duffel/webhook-admin-service";
+import { isRedisKvConfigured } from "@/lib/storage/redis-kv";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 /** Safe check that webhook secret is configured (never exposes the secret). */
 export async function GET() {
-  const raw = process.env.DUFFEL_WEBHOOK_SECRET ?? "";
-  const secret = normalizeDuffelWebhookSecret(raw);
+  const secrets = await listDuffelWebhookSecrets();
+  const primary = secrets[0] ?? "";
+  const envSecret = normalizeDuffelWebhookSecret(process.env.DUFFEL_WEBHOOK_SECRET ?? "");
 
   return Response.json({
     ok: true,
-    secretConfigured: Boolean(secret),
-    secretLength: secret.length,
-    /** Common mistake: pasting the webhook URL instead of the secret. */
-    looksLikeUrl: /^https?:\/\//i.test(secret),
-    /** Common mistake: pasting webhook id (end_…) from the ping curl command. */
-    looksLikeWebhookId: secret.startsWith("end_"),
-    hint: secret
-      ? looksHealthy(secret)
-        ? "Secret is set. If ping fails with Invalid signature, recreate the webhook in Duffel and paste the new secret, then redeploy."
-        : "Secret value looks wrong — use the secret string from Duffel (often ends with ==), not the URL or end_… id."
-      : "Add DUFFEL_WEBHOOK_SECRET in Vercel (Production), then redeploy.",
+    webhookUrl: getDuffelWebhookPublicUrl(),
+    secretSources: {
+      vercelEnv: Boolean(envSecret),
+      upstash: isRedisKvConfigured(),
+      count: secrets.length,
+    },
+    secretConfigured: secrets.length > 0,
+    secretLength: primary.length,
+    looksLikeUrl: /^https?:\/\//i.test(primary),
+    looksLikeWebhookId: primary.startsWith("end_"),
+    secretLooksCorrupted: secrets.some(duffelWebhookSecretLooksCorrupted),
+    secretHasPlus: primary.includes("+"),
+    secretContainsWhitespace: /\s/.test(primary),
+    secretEndsWithEquals: primary.endsWith("=="),
+    secretFingerprint: primary ? fingerprintDuffelWebhookSecret(primary) : null,
+    autoSyncAvailable: isRedisKvConfigured() && Boolean(process.env.DUFFEL_WEBHOOK_SETUP_KEY?.trim()),
+    hint: hintForStatus(secrets, primary, envSecret),
   });
 }
 
-function looksHealthy(secret: string): boolean {
-  if (/^https?:\/\//i.test(secret)) return false;
-  if (secret.startsWith("end_")) return false;
-  return secret.length >= 16;
+function hintForStatus(secrets: string[], primary: string, envSecret: string): string {
+  if (secrets.length === 0) {
+    return "No secret. Set DUFFEL_WEBHOOK_SECRET in Vercel, or configure Upstash + DUFFEL_WEBHOOK_SETUP_KEY and POST /api/admin/duffel-webhook/sync.";
+  }
+  if (duffelWebhookSecretLooksCorrupted(primary)) {
+    return "Secret contains spaces — re-paste from Duffel or run auto-sync.";
+  }
+  if (/^https?:\/\//i.test(primary)) {
+    return "DUFFEL_WEBHOOK_SECRET is a URL. Use the secret string from Duffel, not the webhook URL.";
+  }
+  if (primary.startsWith("end_")) {
+    return "You pasted the webhook id. Use the secret string from Duffel.";
+  }
+  if (isRedisKvConfigured() && !envSecret) {
+    return "Using Upstash-stored secret only. If ping fails, POST /api/admin/duffel-webhook/sync.";
+  }
+  if (secrets.length > 1) {
+    return "Multiple secrets configured (env + Upstash). Verification tries all. If ping fails, run auto-sync.";
+  }
+  return "Secret is set. If ping fails, POST /api/admin/duffel-webhook/sync (recommended) or recreate webhook in Duffel.";
 }
