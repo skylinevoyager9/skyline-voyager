@@ -6,6 +6,7 @@ import { buildDuffelSlicesFromRequest } from "@/lib/flights/trip-types";
 import { parseDuffelFareRules } from "@/lib/flights/fare-rules";
 import { applyFlightMarkup } from "./pricing";
 import type {
+  FlightAvailableService,
   FlightOfferSummary,
   FlightSearchRequest,
   FlightSegmentSummary,
@@ -51,6 +52,17 @@ type DuffelPassengerBaggage = {
   type?: string;
 };
 
+type DuffelAvailableServiceRaw = {
+  id?: string;
+  type?: string;
+  total_amount?: string;
+  total_currency?: string;
+  maximum_quantity?: number;
+  segment_ids?: string[];
+  passenger_ids?: string[];
+  metadata?: Record<string, unknown>;
+};
+
 export type DuffelOffer = {
   id?: string;
   total_amount?: string;
@@ -60,7 +72,46 @@ export type DuffelOffer = {
   slices?: DuffelSlice[];
   passengers?: { id?: string; baggages?: DuffelPassengerBaggage[] }[];
   conditions?: DuffelConditions;
+  available_services?: DuffelAvailableServiceRaw[];
 };
+
+function baggageServiceLabel(metadata: Record<string, unknown> | undefined): string {
+  if (!metadata) return "Extra baggage";
+  const type = typeof metadata.type === "string" ? metadata.type.replace(/_/g, " ") : "";
+  const weight =
+    typeof metadata.maximum_weight_kg === "number"
+      ? `${metadata.maximum_weight_kg}kg`
+      : typeof metadata.maximum_weight_kg === "string"
+        ? `${metadata.maximum_weight_kg}kg`
+        : "";
+  const parts = ["Extra baggage", type, weight].filter(Boolean);
+  return parts.join(" · ") || "Extra baggage";
+}
+
+export function mapDuffelAvailableServices(
+  raw: DuffelAvailableServiceRaw[] | undefined,
+): FlightAvailableService[] {
+  if (!raw?.length) return [];
+  const services: FlightAvailableService[] = [];
+  for (const item of raw) {
+    if (item.type !== "baggage" || !item.id) continue;
+    const amount = item.total_amount;
+    const currency = item.total_currency;
+    const maxQ = item.maximum_quantity;
+    if (!amount || !currency || !Number.isFinite(maxQ) || maxQ! < 1) continue;
+    services.push({
+      id: item.id,
+      type: "baggage",
+      totalAmount: amount,
+      totalCurrency: currency,
+      maximumQuantity: maxQ!,
+      segmentIds: Array.isArray(item.segment_ids) ? item.segment_ids.filter(Boolean) : [],
+      passengerIds: Array.isArray(item.passenger_ids) ? item.passenger_ids.filter(Boolean) : [],
+      label: baggageServiceLabel(item.metadata),
+    });
+  }
+  return services;
+}
 
 type DuffelOfferRequestData = {
   id?: string;
@@ -86,11 +137,9 @@ export function buildDuffelOfferRequestBody(search: FlightSearchRequest) {
     slices,
     passengers,
     cabin_class: search.cabinClass,
+    // Duffel recommends explicit max_connections (0 or 1) for relevance and speed.
+    max_connections: search.maxConnections ?? 1,
   };
-
-  if (search.maxConnections !== undefined) {
-    data.max_connections = search.maxConnections;
-  }
 
   return { data };
 }
@@ -171,6 +220,9 @@ export function mapDuffelOffer(
   mapped.stops = getOfferStops(mapped);
   mapped.totalDurationMinutes = getOfferDurationMinutes(mapped);
   if (outboundDate) mapped.outboundDate = outboundDate;
+
+  const availableServices = mapDuffelAvailableServices(offer.available_services);
+  if (availableServices.length) mapped.availableServices = availableServices;
 
   return mapped;
 }

@@ -1,4 +1,9 @@
 import { applyRateLimit } from "@/lib/api/rate-limit";
+import {
+  computeFlightCheckoutTotals,
+  validateSelectedServices,
+} from "@/lib/flights/ancillaries";
+import { parseSelectedFlightServices } from "@/lib/flights/validation";
 import { getOffer, mapDuffelErrorForClient } from "@/lib/duffel/flight-service";
 import { isDuffelConfigured } from "@/lib/duffel/config";
 import { resolveLiveMarkupPercent } from "@/lib/flights/pricing-request";
@@ -50,10 +55,13 @@ export async function POST(req: Request) {
     );
   }
 
+  const selectedServices = parseSelectedFlightServices(body);
   const markupPercent = await resolveLiveMarkupPercent();
 
   try {
-    const offer = await getOffer(offerId, markupPercent);
+    const offer = await getOffer(offerId, markupPercent, {
+      includeAvailableServices: true,
+    });
     if (!offer) {
       return Response.json(
         { ok: false as const, error: "Offer not found or expired.", code: "offer_not_found" },
@@ -61,18 +69,29 @@ export async function POST(req: Request) {
       );
     }
 
+    const serviceCheck = validateSelectedServices(offer, selectedServices);
+    if (!serviceCheck.ok) {
+      return Response.json(
+        { ok: false as const, error: serviceCheck.error, code: "validation_error" },
+        { status: 400 },
+      );
+    }
+
+    const totals = computeFlightCheckoutTotals(offer, selectedServices, markupPercent);
     const stripe = getStripe();
-    const amount = decimalToStripeMinorUnits(offer.customerAmount, offer.currency);
+    const amount = decimalToStripeMinorUnits(totals.customerAmount, totals.currency);
 
     const intent = await stripe.paymentIntents.create({
       amount,
-      currency: offer.currency.toLowerCase(),
+      currency: totals.currency.toLowerCase(),
       automatic_payment_methods: { enabled: true },
       metadata: {
         offerId: offer.id,
-        customerAmount: offer.customerAmount,
-        baseAmount: offer.baseAmount,
-        markupPercent: String(offer.markupPercent),
+        customerAmount: totals.customerAmount,
+        supplierAmount: totals.paymentAmount,
+        markupPercent: String(totals.markupPercent),
+        servicesTotal: totals.servicesSupplierAmount,
+        selectedServices: JSON.stringify(totals.selectedServices),
       },
     });
 
@@ -88,8 +107,9 @@ export async function POST(req: Request) {
       data: {
         clientSecret: intent.client_secret,
         paymentIntentId: intent.id,
-        customerAmount: offer.customerAmount,
-        currency: offer.currency,
+        customerAmount: totals.customerAmount,
+        currency: totals.currency,
+        servicesSupplierAmount: totals.servicesSupplierAmount,
       },
     });
   } catch (err) {

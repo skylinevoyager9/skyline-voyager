@@ -72,6 +72,23 @@ Flights are searched and booked **on this site** (not via affiliate redirects). 
 
 ---
 
+## Stays booking (Duffel Stays + Stripe)
+
+Hotels and stays use the **same Duffel token** and **same service fee** as flights. Request **Stays API access** in the Duffel dashboard (Developers → Stays) before searching.
+
+| Area | Notes |
+|------|--------|
+| Duffel | Same `DUFFEL_API_TOKEN`, `DUFFEL_MODE`, `DUFFEL_VERSION` |
+| Pricing | Reuses published flight markup (`FLIGHT_MARKUP_PERCENT` / owner publish) |
+| Stripe | Same keys and webhook as flights |
+| Email | Same Resend keys — stay confirmation emails |
+
+**Routes:** `/stays/search` · `/stays/book` · `/stays/lookup`
+
+Flow: search by city → pick property → choose rate → quote → Stripe checkout → Duffel booking (balance / pay-as-you-go).
+
+---
+
 ## Environment variables (optional affiliate links)
 
 | Name | Purpose |
@@ -80,7 +97,7 @@ Flights are searched and booked **on this site** (not via affiliate redirects). 
 | `NEXT_PUBLIC_VIATOR_AFFILIATE_URL` | Viator |
 | `NEXT_PUBLIC_GETYOURGUIDE_AFFILIATE_URL` | GetYourGuide |
 
-Hotels are editorial-only on this site. Redeploy after env changes.
+Redeploy after env changes.
 
 ---
 
@@ -100,7 +117,8 @@ Hotels are editorial-only on this site. Redeploy after env changes.
 | `/flights`, `/hotels`, `/weekend-trips`, `/national-parks`, `/car-rentals`, `/travel-planning` | Topic hubs |
 | `/guides` | All guides + category filters (`?cat=flights`, etc.) |
 | `/guides/[slug]` | Article |
-| `/flights/search`, `/flights/book`, `/flights/lookup` | Duffel search, checkout, booking lookup |
+| `/flights/search`, `/flights/book`, `/flights/lookup` | Duffel flight search, checkout, lookup |
+| `/stays/search`, `/stays/book`, `/stays/lookup` | Duffel Stays search, checkout, lookup |
 | `/about`, `/contact`, `/legal`, `/privacy`, `/terms`, `/affiliate-disclosure` | Company & legal |
 | `/sitemap.xml`, `/robots.txt` | SEO |
 

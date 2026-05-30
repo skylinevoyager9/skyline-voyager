@@ -3,8 +3,13 @@ import type { GuideCategory } from "@/lib/guides/types";
 import { HUB_EMPHASIS } from "@/lib/guides/hub-theme";
 import type { PartnerKey } from "@/lib/partner-links";
 
-/** Checkout on Skyline Voyager is flight-only via Duffel (no hotel OTA partners). */
+/** Checkout on Skyline Voyager includes Duffel flights when configured. */
 export function usesDuffelFlightBooking(): boolean {
+  return isDuffelConfigured();
+}
+
+/** Duffel Stays search + book (same token; requires Stays access on Duffel account). */
+export function usesDuffelStaysBooking(): boolean {
   return isDuffelConfigured();
 }
 

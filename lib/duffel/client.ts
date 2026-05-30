@@ -47,6 +47,7 @@ export async function duffelRequest<T>({
     method,
     headers: {
       Accept: "application/json",
+      "Accept-Encoding": "gzip",
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
       "Duffel-Version": version,

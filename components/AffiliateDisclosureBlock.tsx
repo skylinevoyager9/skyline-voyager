@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { usesDuffelFlightBooking } from "@/lib/booking/platform";
+import { usesDuffelFlightBooking, usesDuffelStaysBooking } from "@/lib/booking/platform";
 import { site } from "@/lib/site";
 
 type Props = {
@@ -12,15 +12,29 @@ export function AffiliateDisclosureBlock({
   className = "",
   variant = "compact",
 }: Props) {
-  const duffelOn = usesDuffelFlightBooking();
+  const duffelFlights = usesDuffelFlightBooking();
+  const duffelStays = usesDuffelStaysBooking();
 
-  const body = duffelOn ? (
+  const body = duffelFlights || duffelStays ? (
     <>
-      <strong className="font-semibold text-stone-800">Flights:</strong> search and
-      checkout on {site.name} with live fares (Duffel). We may earn a service margin
-      on the fare; the price shown is what you pay at checkout.{" "}
-      <strong className="font-semibold text-stone-800">Hotels:</strong> guides only—no
-      Booking.com or OTA checkout links.
+      {duffelFlights ? (
+        <>
+          <strong className="font-semibold text-stone-800">Flights:</strong> search and
+          checkout on {site.name} with live fares (Duffel). We may earn a service margin
+          on the fare; the price shown is what you pay at checkout.{" "}
+        </>
+      ) : null}
+      {duffelStays ? (
+        <>
+          <strong className="font-semibold text-stone-800">Hotels &amp; stays:</strong> search
+          and book on {site.name} (Duffel Stays) with the same transparent total pricing.{" "}
+        </>
+      ) : (
+        <>
+          <strong className="font-semibold text-stone-800">Hotels:</strong> editorial guides
+          only when stays booking is not configured.{" "}
+        </>
+      )}
     </>
   ) : (
     <>

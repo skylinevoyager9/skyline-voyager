@@ -9,6 +9,11 @@ import {
 import type { DuffelOffer } from "./mappers";
 import { getFlightPaymentMode } from "@/lib/flights/payment-mode";
 import { assertFlightPaymentSucceeded, StripePaymentError } from "@/lib/stripe/verify-payment";
+import {
+  buildDuffelOrderServices,
+  computeFlightCheckoutTotals,
+  validateSelectedServices,
+} from "@/lib/flights/ancillaries";
 import { applyFlightMarkup, repriceFlightOffer } from "./pricing";
 import { getPublishedFlightMarkupPercent } from "@/lib/flights/published-markup-store";
 import type {
@@ -43,9 +48,10 @@ type DuffelOrderCreateResponse = {
 
 function getSupplierTimeoutMs(): number {
   const raw = process.env.FLIGHT_SEARCH_TIMEOUT_MS?.trim();
-  if (!raw) return 45_000;
+  // Duffel recommends 20s default; lower = faster, higher = more offers.
+  if (!raw) return 20_000;
   const n = Number.parseInt(raw, 10);
-  if (!Number.isFinite(n) || n < 10_000) return 45_000;
+  if (!Number.isFinite(n) || n < 10_000) return 20_000;
   return Math.min(n, 90_000);
 }
 
@@ -157,10 +163,15 @@ export async function searchFlights(search: FlightSearchRequest): Promise<Flight
 export async function getOffer(
   offerId: string,
   markupPercent?: number,
+  options?: { includeAvailableServices?: boolean },
 ): Promise<FlightOfferSummary | null> {
   const res = await duffelRequest<DuffelOfferGetResponse>({
     method: "GET",
     path: `/air/offers/${encodeURIComponent(offerId)}`,
+    query:
+      options?.includeAvailableServices === true
+        ? { return_available_services: true }
+        : undefined,
   });
   const mapped = mapDuffelOffer((res.data ?? {}) as DuffelOffer);
   if (!mapped) return null;
@@ -173,10 +184,20 @@ export async function getOffer(
 }
 
 export async function bookFlight(request: FlightBookRequest): Promise<FlightBookResponse> {
-  const offer = await getOffer(request.offerId, request.markupPercent);
+  const selectedServices = request.selectedServices ?? [];
+  const offer = await getOffer(request.offerId, request.markupPercent, {
+    includeAvailableServices: true,
+  });
   if (!offer) {
     throw new DuffelApiError(404, [{ message: "Offer not found or expired." }]);
   }
+
+  const serviceCheck = validateSelectedServices(offer, selectedServices);
+  if (!serviceCheck.ok) {
+    throw new DuffelApiError(400, [{ message: serviceCheck.error }]);
+  }
+
+  const totals = computeFlightCheckoutTotals(offer, selectedServices, request.markupPercent);
 
   if (request.passengers.length !== offer.passengerIds.length) {
     throw new DuffelApiError(400, [
@@ -200,22 +221,28 @@ export async function bookFlight(request: FlightBookRequest): Promise<FlightBook
         { message: "Card payment is required before booking this offer." },
       ]);
     }
-    await assertFlightPaymentSucceeded(request.paymentIntentId, offer);
+    await assertFlightPaymentSucceeded(
+      request.paymentIntentId,
+      offer,
+      selectedServices,
+      totals.customerAmount,
+    );
   } else if (request.paymentIntentId) {
     throw new DuffelApiError(400, [
       { message: "Card payment is not used in test balance mode." },
     ]);
   }
 
-  const orderBody = {
+  const duffelServices = buildDuffelOrderServices(selectedServices);
+  const orderBody: { data: Record<string, unknown> } = {
     data: {
       type: "instant",
       selected_offers: [offer.id],
       payments: [
         {
           type: "balance",
-          currency: offer.paymentCurrency,
-          amount: offer.paymentAmount,
+          currency: totals.currency,
+          amount: totals.paymentAmount,
         },
       ],
       passengers: request.passengers.map((p) => ({
@@ -230,6 +257,9 @@ export async function bookFlight(request: FlightBookRequest): Promise<FlightBook
       })),
     },
   };
+  if (duffelServices.length) {
+    orderBody.data.services = duffelServices;
+  }
 
   const res = await duffelRequest<DuffelOrderCreateResponse>({
     method: "POST",
@@ -241,10 +271,11 @@ export async function bookFlight(request: FlightBookRequest): Promise<FlightBook
   return {
     orderId: order.orderId,
     bookingReference: order.bookingReference,
-    currency: offer.currency,
-    customerAmount: offer.customerAmount,
-    baseAmount: offer.baseAmount,
+    currency: totals.currency,
+    customerAmount: totals.customerAmount,
+    baseAmount: totals.supplierTotal,
     liveMode: order.liveMode,
+    selectedServices: totals.selectedServices,
   };
 }
 

@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { FlightSearchCard } from "@/components/flights/FlightSearchCard";
+import { StaysSearchCard } from "@/components/stays/StaysSearchCard";
 import { GuidePartnerStrip } from "@/components/GuidePartnerStrip";
 import { HubBookingDock } from "@/components/HubBookingDock";
-import { hubBookingEmphasis, visiblePartnerKeys } from "@/lib/booking/platform";
+import { hubBookingEmphasis, usesDuffelStaysBooking, visiblePartnerKeys } from "@/lib/booking/platform";
 import { shouldUseDuffelFlightSearch } from "@/lib/flights/links";
 import { GuideCardHero } from "@/components/GuideCardHero";
 import { HUB_THEME } from "@/lib/guides/hub-theme";
@@ -18,6 +19,7 @@ export function CategoryHubPage({
   category,
   prePartnerSlot,
   showLiveFlightSearch = false,
+  showLiveStaysSearch = false,
   flightSearchDefaults,
 }: {
   category: GuideCategory;
@@ -25,14 +27,18 @@ export function CategoryHubPage({
   prePartnerSlot?: ReactNode;
   /** Hero flight search card → `/flights/search` with live Duffel fares when configured. */
   showLiveFlightSearch?: boolean;
+  /** Hero stays search card → `/stays/search` when Duffel Stays is configured. */
+  showLiveStaysSearch?: boolean;
   flightSearchDefaults?: { origin?: string; destination?: string };
 }) {
   const meta = getCategoryMeta(category);
   const theme = HUB_THEME[category];
   const emphasis = hubBookingEmphasis(category);
   const liveSearch = shouldUseDuffelFlightSearch();
+  const liveStays = usesDuffelStaysBooking();
   const showFlightCard =
     liveSearch && (showLiveFlightSearch || !visiblePartnerKeys().includes("booking"));
+  const showStaysCard = liveStays && showLiveStaysSearch && category === "hotels";
   const posts = getGuidesByCategory(category).sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   );
@@ -85,10 +91,16 @@ export function CategoryHubPage({
             {meta.title}
           </h1>
           <p className="mt-6 max-w-2xl text-base font-light leading-relaxed text-white/88 sm:text-lg">
-            {showFlightCard
-              ? "Search live airfares and book flights on Skyline Voyager. Stay guides are editorial only—checkout is flight booking via Duffel, not hotel marketplaces."
+            {showStaysCard
+              ? "Search live hotel rates and book stays on Skyline Voyager. Editorial guides help you choose neighborhoods; checkout is on this site via Duffel."
+              : showFlightCard
+              ? "Search live airfares and book flights on Skyline Voyager. Stay guides are editorial—checkout is flight booking via Duffel."
               : theme.bookingHook}
           </p>
+
+          {showStaysCard ? (
+            <StaysSearchCard className="mt-10 max-w-4xl" />
+          ) : null}
 
           {showFlightCard ? (
             <FlightSearchCard

@@ -1,12 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { FareRulesNotice } from "@/components/flights/FareRulesNotice";
+import {
+  FlightExtraBagsSection,
+  getSelectedServicesFromRecord,
+} from "@/components/flights/FlightExtraBagsSection";
 import { FlightCustomerPricingNote } from "@/components/flights/FlightCustomerPricingNote";
 import { FlightPriceDisclosure } from "@/components/flights/FlightPriceDisclosure";
 import { FlightStripeCheckout } from "@/components/flights/FlightStripeCheckout";
 import { OfferExpiryCountdown } from "@/components/flights/OfferExpiryCountdown";
+import { computeFlightCheckoutTotals } from "@/lib/flights/ancillaries";
 import type { FlightRuntimeLabels } from "@/lib/flights/runtime-labels";
 import type {
   BookPassengerInput,
@@ -70,6 +75,16 @@ export function FlightBookingPanel({
   } | null>(null);
   const [checkoutSecret, setCheckoutSecret] = useState<string | null>(null);
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
+  const [bagSelections, setBagSelections] = useState<Record<string, number>>({});
+
+  const selectedServices = useMemo(
+    () => getSelectedServicesFromRecord(bagSelections),
+    [bagSelections],
+  );
+  const checkoutTotals = useMemo(
+    () => computeFlightCheckoutTotals(offer, selectedServices, offer.markupPercent),
+    [offer, selectedServices],
+  );
 
   useEffect(() => {
     fetch("/api/flights/status")
@@ -84,7 +99,13 @@ export function FlightBookingPanel({
     setPaymentIntentId(null);
     setBookSuccess(null);
     setError(null);
+    setBagSelections({});
   }, [offer.id, offer.passengerIds]);
+
+  useEffect(() => {
+    setCheckoutSecret(null);
+    setPaymentIntentId(null);
+  }, [bagSelections]);
 
   const stripePublishableKey =
     typeof process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY === "string"
@@ -107,6 +128,7 @@ export function FlightBookingPanel({
           passengers,
           paymentIntentId: intentId ?? paymentIntentId ?? undefined,
           markupPercent: offer.markupPercent,
+          selectedServices,
         }),
       });
       const json = (await res.json()) as {
@@ -150,6 +172,7 @@ export function FlightBookingPanel({
           body: JSON.stringify({
             offerId: offer.id,
             markupPercent: offer.markupPercent,
+            selectedServices,
           }),
         });
         const json = (await res.json()) as {
@@ -248,8 +271,14 @@ export function FlightBookingPanel({
         </p>
         <p className="text-xs font-medium text-stone-500">{CUSTOMER_TOTAL_LABEL}</p>
         <p className="font-display mt-1 text-2xl font-bold text-stone-900">
-          {formatMoney(offer.customerAmount, offer.currency)}
+          {formatMoney(checkoutTotals.customerAmount, offer.currency)}
         </p>
+        {selectedServices.length > 0 ? (
+          <p className="mt-1 text-sm text-stone-600">
+            Fare {formatMoney(offer.customerAmount, offer.currency)} + extra bags{" "}
+            {formatMoney(checkoutTotals.servicesSupplierAmount, offer.currency)}
+          </p>
+        ) : null}
         <FlightPriceDisclosure offer={offer} />
         {offer.expiresAt ? (
           <OfferExpiryCountdown expiresAt={offer.expiresAt} className="mt-2 text-xs text-amber-800" />
@@ -300,11 +329,17 @@ export function FlightBookingPanel({
           </Link>
         </div>
       ) : (
+        <>
+          <FlightExtraBagsSection
+            offer={offer}
+            selections={bagSelections}
+            onChange={setBagSelections}
+          />
         <div className="rounded-3xl border border-stone-200 bg-stone-50 p-6 sm:p-8">
           <h2 className="font-display text-xl font-bold text-stone-900">Passenger details</h2>
           <p className="mt-2 text-sm text-stone-600">
             Booking{" "}
-            <strong>{formatMoney(offer.customerAmount, offer.currency)}</strong>
+            <strong>{formatMoney(checkoutTotals.customerAmount, offer.currency)}</strong>
             {useStripeCheckout
               ? " — pay by card, then we place the order with the airline via Duffel."
               : " — test mode uses your Duffel account balance (no card)."}
@@ -487,6 +522,7 @@ export function FlightBookingPanel({
             </div>
           ) : null}
         </div>
+        </>
       )}
     </div>
   );

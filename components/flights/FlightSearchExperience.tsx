@@ -311,33 +311,120 @@ export function FlightSearchExperience({
         )}
 
         {!isMulti ? (
-          <div className="mt-5 flex flex-wrap gap-4 rounded-2xl border border-stone-200/80 bg-stone-50/80 px-4 py-3">
-            <label className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-stone-700">
-              <input
-                type="checkbox"
-                checked={form.directOnly}
-                onChange={(e) => setForm({ ...form, directOnly: e.target.checked })}
-                className="rounded border-stone-300 text-sky-600"
-              />
-              Direct / nonstop only
-            </label>
-            <label className="inline-flex items-center gap-2 text-sm font-medium text-stone-700">
-              <span>Flexible dates</span>
-              <select
-                value={String(form.flexDays)}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    flexDays: Number(e.target.value) as 0 | 1 | 3,
-                  })
-                }
-                className="rounded-lg border border-stone-200 bg-white px-2 py-1 text-sm font-semibold"
+          <div className="mt-5 space-y-4 rounded-2xl border border-stone-200/80 bg-stone-50/80 px-4 py-3">
+            <div className="flex flex-wrap gap-4">
+              <label className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-stone-700">
+                <input
+                  type="checkbox"
+                  checked={form.directOnly}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      directOnly: e.target.checked,
+                      maxConnections: e.target.checked ? 0 : 1,
+                    })
+                  }
+                  className="rounded border-stone-300 text-sky-600"
+                />
+                Direct / nonstop only
+              </label>
+              {!form.directOnly ? (
+                <label className="inline-flex items-center gap-2 text-sm font-medium text-stone-700">
+                  <span>Max connections</span>
+                  <select
+                    value={String(form.maxConnections)}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        maxConnections: Number.parseInt(e.target.value, 10) as 1 | 2,
+                      })
+                    }
+                    className="rounded-lg border border-stone-200 bg-white px-2 py-1 text-sm font-semibold"
+                  >
+                    <option value="1">Up to 1 stop (recommended)</option>
+                    <option value="2">Up to 2 stops</option>
+                  </select>
+                </label>
+              ) : null}
+              <label className="inline-flex items-center gap-2 text-sm font-medium text-stone-700">
+                <span>Flexible dates</span>
+                <select
+                  value={String(form.flexDays)}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      flexDays: Number.parseInt(e.target.value, 10) as 0 | 1 | 3,
+                    })
+                  }
+                  className="rounded-lg border border-stone-200 bg-white px-2 py-1 text-sm font-semibold"
+                >
+                  <option value="0">Exact dates only</option>
+                  <option value="1">±1 day (recommended)</option>
+                  <option value="3">±3 days</option>
+                </select>
+              </label>
+            </div>
+            <div>
+              <button
+                type="button"
+                onClick={() => setForm((f) => ({ ...f, showTimeFilters: !f.showTimeFilters }))}
+                className="text-sm font-semibold text-amber-900/90 hover:underline"
               >
-                <option value="0">Exact dates only</option>
-                <option value="1">±1 day (recommended)</option>
-                <option value="3">±3 days</option>
-              </select>
-            </label>
+                {form.showTimeFilters ? "Hide" : "Show"} outbound time filters (optional)
+              </button>
+              {form.showTimeFilters ? (
+                <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  <label className="block text-sm">
+                    <span className={flightFieldLabel}>Depart after</span>
+                    <input
+                      type="time"
+                      value={form.outboundDepartureTimeFrom}
+                      onChange={(e) =>
+                        setForm({ ...form, outboundDepartureTimeFrom: e.target.value })
+                      }
+                      className={flightFieldInput}
+                    />
+                  </label>
+                  <label className="block text-sm">
+                    <span className={flightFieldLabel}>Depart before</span>
+                    <input
+                      type="time"
+                      value={form.outboundDepartureTimeTo}
+                      onChange={(e) =>
+                        setForm({ ...form, outboundDepartureTimeTo: e.target.value })
+                      }
+                      className={flightFieldInput}
+                    />
+                  </label>
+                  <label className="block text-sm">
+                    <span className={flightFieldLabel}>Arrive after</span>
+                    <input
+                      type="time"
+                      value={form.outboundArrivalTimeFrom}
+                      onChange={(e) =>
+                        setForm({ ...form, outboundArrivalTimeFrom: e.target.value })
+                      }
+                      className={flightFieldInput}
+                    />
+                  </label>
+                  <label className="block text-sm">
+                    <span className={flightFieldLabel}>Arrive before</span>
+                    <input
+                      type="time"
+                      value={form.outboundArrivalTimeTo}
+                      onChange={(e) =>
+                        setForm({ ...form, outboundArrivalTimeTo: e.target.value })
+                      }
+                      className={flightFieldInput}
+                    />
+                  </label>
+                </div>
+              ) : null}
+              <p className="mt-2 text-xs text-stone-500">
+                Time filters apply to the outbound flight only and speed up search when you know
+                your schedule (Duffel best practice).
+              </p>
+            </div>
           </div>
         ) : null}
 

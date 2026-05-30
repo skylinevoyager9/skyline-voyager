@@ -1,4 +1,5 @@
-import type { FlightOfferSummary } from "@/lib/duffel/types";
+import { computeFlightCheckoutTotals } from "@/lib/flights/ancillaries";
+import type { FlightOfferSummary, SelectedFlightService } from "@/lib/duffel/types";
 import { decimalToStripeMinorUnits } from "./amounts";
 import { getStripe } from "./server";
 
@@ -12,10 +13,12 @@ export class StripePaymentError extends Error {
   }
 }
 
-/** Ensure the customer paid the marked-up offer price before we pay Duffel. */
+/** Ensure the customer paid the marked-up offer price (fare + optional bags) before we pay Duffel. */
 export async function assertFlightPaymentSucceeded(
   paymentIntentId: string,
   offer: FlightOfferSummary,
+  selectedServices: SelectedFlightService[] = [],
+  expectedCustomerAmount?: string,
 ): Promise<void> {
   const stripe = getStripe();
   const intent = await stripe.paymentIntents.retrieve(paymentIntentId);
@@ -27,7 +30,9 @@ export async function assertFlightPaymentSucceeded(
     );
   }
 
-  const expectedMinor = decimalToStripeMinorUnits(offer.customerAmount, offer.currency);
+  const totals = computeFlightCheckoutTotals(offer, selectedServices, offer.markupPercent);
+  const customerAmount = expectedCustomerAmount ?? totals.customerAmount;
+  const expectedMinor = decimalToStripeMinorUnits(customerAmount, offer.currency);
   if (intent.amount !== expectedMinor) {
     throw new StripePaymentError(
       "payment_amount_mismatch",

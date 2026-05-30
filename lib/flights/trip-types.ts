@@ -43,29 +43,68 @@ export function buildDuffelSlicesFromRequest(search: FlightSearchRequest): Array
   origin: string;
   destination: string;
   departure_date: string;
+  departure_time?: { from?: string; to?: string };
+  arrival_time?: { from?: string; to?: string };
 }> {
-  if (search.tripType === "multi_city" && search.slices?.length) {
-    return search.slices.map((s) => ({
+  const mapSlice = (
+    s: FlightSearchSlice,
+    index: number,
+  ): {
+    origin: string;
+    destination: string;
+    departure_date: string;
+    departure_time?: { from?: string; to?: string };
+    arrival_time?: { from?: string; to?: string };
+  } => {
+    const base = {
       origin: s.origin.toUpperCase(),
       destination: s.destination.toUpperCase(),
       departure_date: s.departureDate,
-    }));
+    };
+    if (index !== 0) return base;
+
+    const departureTime =
+      s.departureTime ??
+      (search.outboundDepartureTime?.from || search.outboundDepartureTime?.to
+        ? search.outboundDepartureTime
+        : undefined);
+    const arrivalTime =
+      s.arrivalTime ??
+      (search.outboundArrivalTime?.from || search.outboundArrivalTime?.to
+        ? search.outboundArrivalTime
+        : undefined);
+
+    return {
+      ...base,
+      ...(departureTime ? { departure_time: departureTime } : {}),
+      ...(arrivalTime ? { arrival_time: arrivalTime } : {}),
+    };
+  };
+
+  if (search.tripType === "multi_city" && search.slices?.length) {
+    return search.slices.map((s, i) => mapSlice(s, i));
   }
 
-  const slices = [
+  const slices = [mapSlice(
     {
-      origin: search.origin.toUpperCase(),
-      destination: search.destination.toUpperCase(),
-      departure_date: search.departureDate,
+      origin: search.origin,
+      destination: search.destination,
+      departureDate: search.departureDate,
     },
-  ];
+    0,
+  )];
 
   if (search.tripType === "return" && search.returnDate) {
-    slices.push({
-      origin: search.destination.toUpperCase(),
-      destination: search.origin.toUpperCase(),
-      departure_date: search.returnDate,
-    });
+    slices.push(
+      mapSlice(
+        {
+          origin: search.destination,
+          destination: search.origin,
+          departureDate: search.returnDate,
+        },
+        1,
+      ),
+    );
   }
 
   return slices;

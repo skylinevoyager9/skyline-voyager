@@ -27,7 +27,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    const offer = await getOffer(offerId, markupPercent);
+    const offer = await getOffer(offerId, markupPercent, { includeAvailableServices: true });
     if (!offer) {
       return Response.json(
         { ok: false as const, error: "Offer not found or expired.", code: "offer_not_found" },

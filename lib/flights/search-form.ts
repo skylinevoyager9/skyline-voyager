@@ -17,6 +17,14 @@ export type FlightSearchFormState = {
   flexDays: 0 | 1 | 3;
   /** When true, Duffel max_connections = 0. */
   directOnly: boolean;
+  /** 1 = up to one stop (Duffel default), 2 = more offers, slower. Ignored when directOnly. */
+  maxConnections: 0 | 1 | 2;
+  /** Optional outbound slice time filters (HH:MM, 24h). */
+  outboundDepartureTimeFrom: string;
+  outboundDepartureTimeTo: string;
+  outboundArrivalTimeFrom: string;
+  outboundArrivalTimeTo: string;
+  showTimeFilters: boolean;
 };
 
 export function createDefaultSearchForm(
@@ -42,22 +50,38 @@ export function createDefaultSearchForm(
     cabinClass: "economy",
     flexDays: 0,
     directOnly: false,
+    maxConnections: 1,
+    outboundDepartureTimeFrom: "",
+    outboundDepartureTimeTo: "",
+    outboundArrivalTimeFrom: "",
+    outboundArrivalTimeTo: "",
+    showTimeFilters: false,
     ...overrides,
   };
 }
 
-function searchOptionsFromForm(form: FlightSearchFormState): Pick<
+function outboundTimeFields(form: FlightSearchFormState): Pick<
   FlightSearchRequest,
-  "maxConnections" | "flexDays"
+  "outboundDepartureTime" | "outboundArrivalTime"
 > {
+  const depFrom = form.outboundDepartureTimeFrom.trim();
+  const depTo = form.outboundDepartureTimeTo.trim();
+  const arrFrom = form.outboundArrivalTimeFrom.trim();
+  const arrTo = form.outboundArrivalTimeTo.trim();
   return {
-    maxConnections: form.directOnly ? 0 : 1,
-    flexDays: form.tripType === "multi_city" ? 0 : form.flexDays,
+    ...(depFrom || depTo
+      ? { outboundDepartureTime: { ...(depFrom ? { from: depFrom } : {}), ...(depTo ? { to: depTo } : {}) } }
+      : {}),
+    ...(arrFrom || arrTo
+      ? { outboundArrivalTime: { ...(arrFrom ? { from: arrFrom } : {}), ...(arrTo ? { to: arrTo } : {}) } }
+      : {}),
   };
 }
 
 export function formStateToSearchRequest(form: FlightSearchFormState): FlightSearchRequest {
-  const options = searchOptionsFromForm(form);
+  const maxConnections = form.directOnly ? 0 : form.maxConnections;
+  const flexDays = form.tripType === "multi_city" ? 0 : form.flexDays;
+  const timeFilters = outboundTimeFields(form);
 
   if (form.tripType === "multi_city") {
     return {
@@ -69,7 +93,8 @@ export function formStateToSearchRequest(form: FlightSearchFormState): FlightSea
       adults: form.adults,
       children: form.children > 0 ? form.children : undefined,
       cabinClass: form.cabinClass,
-      maxConnections: options.maxConnections,
+      maxConnections,
+      ...timeFilters,
     };
   }
 
@@ -82,7 +107,9 @@ export function formStateToSearchRequest(form: FlightSearchFormState): FlightSea
     adults: form.adults,
     children: form.children > 0 ? form.children : undefined,
     cabinClass: form.cabinClass,
-    ...options,
+    maxConnections,
+    flexDays,
+    ...timeFilters,
   };
 }
 

@@ -43,6 +43,38 @@ export default function TermsPage() {
           </p>
         </section>
 
+        <section id="flight-cancellations">
+          <h2 className="font-display text-xl font-semibold text-[var(--color-ink)]">
+            Flight bookings — changes &amp; cancellations
+          </h2>
+          <p className="mt-3">
+            When you book flights on {site.domain}, tickets are issued through airline
+            partners via our booking provider. <strong>Change and refund rules are set by
+            the airline and fare type</strong>, not by {site.legalName}.
+          </p>
+          <ul className="mt-3 list-disc space-y-2 pl-5">
+            <li>
+              <strong>Cancellations:</strong> If online cancellation is offered, you will see an
+              airline refund quote before you confirm. The quote may be $0 for non-refundable
+              fares.
+            </li>
+            <li>
+              <strong>Card refunds:</strong> When the airline returns a cash refund to us, we
+              refund your card up to what you paid, capped by the airline amount. On{" "}
+              <strong>partial</strong> airline refunds, service fees and non-refundable extras are
+              generally not returned.
+            </li>
+            <li>
+              <strong>Airline credit:</strong> If the airline issues travel credit instead of cash,
+              we do not automatically refund your card; contact us for assistance.
+            </li>
+            <li>
+              <strong>Timing:</strong> Card refunds typically post in 5–10 business days after we
+              process them.
+            </li>
+          </ul>
+        </section>
+
         <section>
           <h2 className="font-display text-xl font-semibold text-[var(--color-ink)]">
             Third-party services &amp; affiliate links

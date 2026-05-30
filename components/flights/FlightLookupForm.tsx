@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { formatMoney } from "@/lib/flights/format";
@@ -111,6 +112,12 @@ export function FlightLookupForm() {
             Booked {new Date(data.createdAt).toLocaleString()}
             {data.liveMode ? "" : " (test booking)"}
           </p>
+          <Link
+            href={`/flights/manage?email=${encodeURIComponent(email)}&orderId=${encodeURIComponent(data.orderId)}`}
+            className="mt-4 inline-block rounded-full bg-emerald-900 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-800"
+          >
+            Manage or change booking
+          </Link>
         </div>
       ) : null}
     </div>

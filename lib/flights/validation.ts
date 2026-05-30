@@ -4,6 +4,7 @@ import type {
   FlightBookRequest,
   FlightSearchRequest,
   FlightSearchSlice,
+  SelectedFlightService,
   TripType,
 } from "@/lib/duffel/types";
 import { clampMarkupPercent } from "@/lib/duffel/pricing";
@@ -135,6 +136,75 @@ function parseSearchEnhancements(b: Record<string, unknown>) {
   return { maxConnections, flexDays, directOnly };
 }
 
+const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+function parseOptionalTime(value: unknown, field: string): ValidationResult<string | undefined> {
+  if (value === undefined || value === null || value === "") {
+    return { ok: true, value: undefined };
+  }
+  if (typeof value !== "string") {
+    return { ok: false, error: "Invalid time format.", field };
+  }
+  const t = value.trim();
+  if (!TIME_RE.test(t)) {
+    return { ok: false, error: "Use 24-hour time HH:MM.", field };
+  }
+  return { ok: true, value: t };
+}
+
+function parseTimeWindow(
+  b: Record<string, unknown>,
+  prefix: string,
+): ValidationResult<{ from?: string; to?: string } | undefined> {
+  const fromKey = `${prefix}From`;
+  const toKey = `${prefix}To`;
+  const from = parseOptionalTime(b[fromKey], fromKey);
+  if (!from.ok) return from;
+  const to = parseOptionalTime(b[toKey], toKey);
+  if (!to.ok) return to;
+  if (!from.value && !to.value) return { ok: true, value: undefined };
+  return { ok: true, value: { from: from.value, to: to.value } };
+}
+
+function parseTimeWindowObject(
+  o: Record<string, unknown>,
+  field: string,
+): ValidationResult<{ from?: string; to?: string } | undefined> {
+  const from = parseOptionalTime(o.from, `${field}.from`);
+  if (!from.ok) return from;
+  const to = parseOptionalTime(o.to, `${field}.to`);
+  if (!to.ok) return to;
+  if (!from.value && !to.value) return { ok: true, value: undefined };
+  return { ok: true, value: { from: from.value, to: to.value } };
+}
+
+function parseOutboundTimeFilters(b: Record<string, unknown>): ValidationResult<{
+  outboundDepartureTime?: { from?: string; to?: string };
+  outboundArrivalTime?: { from?: string; to?: string };
+}> {
+  const depRaw = b.outboundDepartureTime;
+  const dep =
+    depRaw && typeof depRaw === "object"
+      ? parseTimeWindowObject(depRaw as Record<string, unknown>, "outboundDepartureTime")
+      : parseTimeWindow(b, "outboundDepartureTime");
+  if (!dep.ok) return dep;
+
+  const arrRaw = b.outboundArrivalTime;
+  const arr =
+    arrRaw && typeof arrRaw === "object"
+      ? parseTimeWindowObject(arrRaw as Record<string, unknown>, "outboundArrivalTime")
+      : parseTimeWindow(b, "outboundArrivalTime");
+  if (!arr.ok) return arr;
+
+  return {
+    ok: true,
+    value: {
+      ...(dep.value ? { outboundDepartureTime: dep.value } : {}),
+      ...(arr.value ? { outboundArrivalTime: arr.value } : {}),
+    },
+  };
+}
+
 function parseSlices(raw: unknown): FlightSearchSlice[] | null {
   if (!Array.isArray(raw)) return null;
   const slices: FlightSearchSlice[] = [];
@@ -194,6 +264,8 @@ function parseSearchBody(body: unknown): ValidationResult<FlightSearchRequest> {
 
     const first = validated[0]!;
     const enhanced = parseSearchEnhancements(b);
+    const times = parseOutboundTimeFilters(b);
+    if (!times.ok) return times;
     return {
       ok: true,
       value: {
@@ -207,6 +279,7 @@ function parseSearchBody(body: unknown): ValidationResult<FlightSearchRequest> {
         cabinClass: passengers.cabinClass,
         maxConnections: enhanced.maxConnections,
         flexDays: 0,
+        ...times.value,
       },
     };
   }
@@ -265,6 +338,8 @@ function parseSearchBody(body: unknown): ValidationResult<FlightSearchRequest> {
   }
 
   const enhanced = parseSearchEnhancements(b);
+  const times = parseOutboundTimeFilters(b);
+  if (!times.ok) return times;
 
   return {
     ok: true,
@@ -279,6 +354,7 @@ function parseSearchBody(body: unknown): ValidationResult<FlightSearchRequest> {
       cabinClass: passengers.cabinClass,
       maxConnections: enhanced.maxConnections,
       flexDays: enhanced.flexDays,
+      ...times.value,
     },
   };
 }
@@ -327,6 +403,25 @@ function parsePassenger(p: unknown, index: number): ValidationResult<BookPasseng
   };
 }
 
+export function parseSelectedFlightServices(body: unknown): SelectedFlightService[] {
+  if (typeof body !== "object" || body === null) return [];
+  const raw = (body as Record<string, unknown>).selectedServices;
+  if (!Array.isArray(raw)) return [];
+
+  const selected: SelectedFlightService[] = [];
+  for (const item of raw) {
+    if (typeof item !== "object" || item === null) continue;
+    const o = item as Record<string, unknown>;
+    const serviceId = typeof o.serviceId === "string" ? o.serviceId.trim() : "";
+    const quantity =
+      typeof o.quantity === "number" ? o.quantity : Number.parseInt(String(o.quantity), 10);
+    if (!serviceId) continue;
+    if (!Number.isInteger(quantity) || quantity < 1) continue;
+    selected.push({ serviceId, quantity });
+  }
+  return selected;
+}
+
 function parseBookBody(body: unknown): ValidationResult<FlightBookRequest> {
   if (typeof body !== "object" || body === null) {
     return { ok: false, error: "Invalid request body." };
@@ -357,8 +452,12 @@ function parseBookBody(body: unknown): ValidationResult<FlightBookRequest> {
   }
 
   const markupPercent = parseMarkupPercentField(b.markupPercent);
+  const selectedServices = parseSelectedFlightServices(b);
 
-  return { ok: true, value: { offerId, passengers, paymentIntentId, markupPercent } };
+  return {
+    ok: true,
+    value: { offerId, passengers, paymentIntentId, markupPercent, selectedServices },
+  };
 }
 
 function parseMarkupPercentField(raw: unknown): number | undefined {

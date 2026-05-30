@@ -12,6 +12,9 @@ export type FlightSearchSlice = {
   origin: string;
   destination: string;
   departureDate: string;
+  /** Duffel slice filter — HH:MM (24h). */
+  departureTime?: { from?: string; to?: string };
+  arrivalTime?: { from?: string; to?: string };
 };
 
 export type FlightSearchRequest = {
@@ -28,6 +31,9 @@ export type FlightSearchRequest = {
   cabinClass: CabinClass;
   /** 0 = direct only, 1 = up to one connection (Duffel default). */
   maxConnections?: 0 | 1 | 2;
+  /** Optional time filters on the first outbound slice (Duffel search best practice). */
+  outboundDepartureTime?: { from?: string; to?: string };
+  outboundArrivalTime?: { from?: string; to?: string };
   /** Search outbound ±N days and merge cheapest offers (one-way / return only). */
   flexDays?: 0 | 1 | 3;
 };
@@ -50,6 +56,25 @@ export type FlightSliceSummary = {
   destination: string;
   departureDate: string;
   segments: FlightSegmentSummary[];
+};
+
+export type FlightAvailableServiceType = "baggage";
+
+export type FlightAvailableService = {
+  id: string;
+  type: FlightAvailableServiceType;
+  totalAmount: string;
+  totalCurrency: string;
+  maximumQuantity: number;
+  segmentIds: string[];
+  passengerIds: string[];
+  /** Guest-facing label, e.g. "Checked bag · 23kg". */
+  label: string;
+};
+
+export type SelectedFlightService = {
+  serviceId: string;
+  quantity: number;
 };
 
 export type FareRulesSummary = {
@@ -80,6 +105,8 @@ export type FlightOfferSummary = {
   /** When flex search was used, outbound date for this offer. */
   outboundDate?: string;
   fareRules?: FareRulesSummary;
+  /** Extra bags (when offer fetched with return_available_services). */
+  availableServices?: FlightAvailableService[];
 };
 
 export type FlightSearchResponse = {
@@ -112,6 +139,8 @@ export type FlightBookRequest = {
   paymentIntentId?: string;
   /** Service fee % locked from search (must match server policy). */
   markupPercent?: number;
+  /** Duffel available_services (baggage) to add to the order. */
+  selectedServices?: SelectedFlightService[];
 };
 
 export type FlightBookResponse = {
@@ -122,4 +151,5 @@ export type FlightBookResponse = {
   baseAmount: string;
   liveMode: boolean;
   emailSent?: boolean;
+  selectedServices?: SelectedFlightService[];
 };
