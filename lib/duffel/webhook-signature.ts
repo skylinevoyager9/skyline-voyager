@@ -24,11 +24,23 @@ function secretKeyCandidates(secret: string): Buffer[] {
   return keys;
 }
 
-function computeV1Hex(key: Buffer, timestamp: string, payload: Buffer): string {
-  const signed = Buffer.from(`${timestamp}.`, "utf8");
-  return createHmac("sha256", key)
-    .update(Buffer.concat([signed, payload]))
-    .digest("hex");
+function signedPayload(timestamp: string, payload: Buffer): Buffer {
+  return Buffer.concat([Buffer.from(`${timestamp}.`, "utf8"), payload]);
+}
+
+function computeV1Hex(key: Buffer | string, timestamp: string, payload: Buffer): string {
+  return createHmac("sha256", key).update(signedPayload(timestamp, payload)).digest("hex");
+}
+
+function hexEqual(a: string, b: string): boolean {
+  const al = a.toLowerCase();
+  const bl = b.toLowerCase();
+  if (al.length !== bl.length || al.length % 2 !== 0) return false;
+  try {
+    return timingSafeEqual(Buffer.from(al, "hex"), Buffer.from(bl, "hex"));
+  } catch {
+    return false;
+  }
 }
 
 /** Verify Duffel `X-Duffel-Signature` header (t=timestamp,v1=hex). */
@@ -51,17 +63,11 @@ export function verifyDuffelWebhookSignature(
 
   const payload = typeof rawBody === "string" ? Buffer.from(rawBody, "utf8") : rawBody;
 
-  try {
-    const expected = Buffer.from(v1, "hex");
-    for (const key of secretKeyCandidates(secret)) {
-      const localHex = computeV1Hex(key, timestamp, payload);
-      const local = Buffer.from(localHex, "hex");
-      if (expected.length === local.length && timingSafeEqual(expected, local)) {
-        return true;
-      }
-    }
-    return false;
-  } catch {
-    return false;
+  const normalized = normalizeDuffelWebhookSecret(secret);
+  if (hexEqual(v1, computeV1Hex(normalized, timestamp, payload))) return true;
+
+  for (const key of secretKeyCandidates(secret)) {
+    if (hexEqual(v1, computeV1Hex(key, timestamp, payload))) return true;
   }
+  return false;
 }

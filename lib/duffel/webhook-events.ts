@@ -107,7 +107,8 @@ export async function handleDuffelWebhookEvent(event: DuffelWebhookEvent): Promi
       if (orderId) await notifyScheduleChange(orderId, event);
       return;
     case "order.created":
-    case "order.updated":
+    case "order.updated": // legacy name (not in current Duffel event list)
+    case "air.order.changed":
       return;
     default:
       break;
