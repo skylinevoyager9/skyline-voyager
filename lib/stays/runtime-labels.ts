@@ -23,7 +23,7 @@ export function getStayRuntimeLabels(): StayRuntimeLabels {
       isProductionBooking: true,
       searchHeadline: "Search hotels & stays",
       searchSubline:
-        "Live availability and secure card checkout. Totals include our agency service fee before you pay.",
+        "Compare live availability. Prices include our service fee — what you see is what you pay.",
       bookingConfirmedTitle: "Stay confirmed",
     };
   }

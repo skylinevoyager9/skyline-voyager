@@ -2,7 +2,7 @@
 
 export const CUSTOMER_TOTAL_LABEL = "Total price";
 
-export const CUSTOMER_FEE_LINE = "Includes agency service fee";
+export const CUSTOMER_FEE_LINE = "Prices include our service fee";
 
 export const CUSTOMER_CHECKOUT_NOTE =
   "The total shown is what you pay. We place your ticket with the airline after payment; fare rules apply as shown at booking.";

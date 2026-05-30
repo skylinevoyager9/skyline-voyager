@@ -185,17 +185,30 @@ export function FlightSearchExperience({
 
   return (
     <div className="space-y-10">
-      {status ? (
-        <p className="text-sm text-stone-600">
-          Duffel mode: <strong className="text-stone-800">{status.mode}</strong>
-          {" "}
-          · Live service fee:{" "}
-          <strong className="text-stone-800">{liveFeePercent}%</strong>
-          {ownerKey ? " (you can publish a new rate below)" : null}{" "}
-          · Payment:{" "}
-          <strong className="text-stone-800">
-            {status.paymentMode === "stripe" ? "Stripe card" : "Duffel test balance"}
-          </strong>
+      {status && (ownerKey || status.mode === "test") ? (
+        <p
+          className={
+            status.mode === "test"
+              ? "rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950"
+              : "text-sm text-stone-600"
+          }
+        >
+          {status.mode === "test" ? (
+            <>
+              <strong>Test booking mode.</strong> Fares are from Duffel test inventory — no real
+              tickets. Payment:{" "}
+              <strong>
+                {status.paymentMode === "stripe" ? "Stripe (use test card 4242…)" : "Duffel balance"}
+              </strong>
+              .
+            </>
+          ) : (
+            <>
+              Owner view — published service fee:{" "}
+              <strong className="text-stone-800">{liveFeePercent}%</strong> (adjust below before
+              publishing to the live site)
+            </>
+          )}
         </p>
       ) : null}
 

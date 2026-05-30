@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { FlightSearchExperience } from "@/components/flights/FlightSearchExperience";
 import { isDuffelConfigured } from "@/lib/duffel/config";
-import { getFlightPaymentMode } from "@/lib/flights/payment-mode";
 import { isOwnerPricingKeyValid } from "@/lib/flights/owner-pricing";
 import { getFlightRuntimeLabels } from "@/lib/flights/runtime-labels";
 
@@ -19,7 +18,6 @@ export default async function FlightSearchPage({ searchParams }: Props) {
   const ownerPricingKey = isOwnerPricingKeyValid(owner) ? owner!.trim() : undefined;
 
   const configured = isDuffelConfigured();
-  const paymentMode = getFlightPaymentMode();
   const labels = getFlightRuntimeLabels();
 
   return (
@@ -41,9 +39,9 @@ export default async function FlightSearchPage({ searchParams }: Props) {
         </h1>
         <p className="mt-3 max-w-2xl text-stone-600 leading-relaxed">
           {labels.searchSubline}
-          {paymentMode === "stripe"
-            ? " Pay by card (Apple Pay / Google Pay when available), then we ticket with the airline."
-            : " Add Stripe keys to accept card payments."}
+          {!labels.isProductionBooking && labels.duffelMode === "test"
+            ? " Use a test card (4242…) if paying by card."
+            : null}
         </p>
         <p className="mt-2 text-sm">
           <Link href="/flights/lookup" className="font-semibold text-sky-800 underline-offset-2 hover:underline">

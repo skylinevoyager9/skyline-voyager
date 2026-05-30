@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { FlightBookPageClient } from "@/components/flights/FlightBookPageClient";
 import { isDuffelConfigured } from "@/lib/duffel/config";
-import { getFlightPaymentMode } from "@/lib/flights/payment-mode";
+import { getFlightRuntimeLabels } from "@/lib/flights/runtime-labels";
 
 export const metadata: Metadata = {
   title: "Book flight",
@@ -16,7 +16,7 @@ function BookFallback() {
 
 export default function FlightBookPage() {
   const configured = isDuffelConfigured();
-  const paymentMode = getFlightPaymentMode();
+  const labels = getFlightRuntimeLabels();
 
   return (
     <main className="bg-stone-100">
@@ -40,8 +40,8 @@ export default function FlightBookPage() {
           Complete your booking
         </h1>
         <p className="mt-3 max-w-2xl text-stone-600 leading-relaxed">
-          Enter passenger details
-          {paymentMode === "stripe" ? " and pay by card" : " and confirm (Duffel test balance)"}.
+          Enter passenger details and pay securely. Total price includes our service fee.
+          {labels.duffelMode === "test" ? " (Test booking — no real ticket.)" : null}
         </p>
         <div className="mt-10">
           <Suspense fallback={<BookFallback />}>

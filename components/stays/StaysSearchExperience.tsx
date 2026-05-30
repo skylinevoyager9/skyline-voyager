@@ -146,15 +146,9 @@ export function StaysSearchExperience({ configured }: Props) {
 
   return (
     <div className="space-y-8">
-      {status ? (
-        <p className="text-sm text-stone-600">
-          Duffel mode: <strong className="text-stone-800">{status.mode}</strong>
-          {status.markupPercent > 0 ? (
-            <>
-              {" "}
-              · Service fee: <strong className="text-stone-800">{status.markupPercent}%</strong>
-            </>
-          ) : null}
+      {status && status.mode === "test" ? (
+        <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+          <strong>Test mode.</strong> Stays search uses Duffel test inventory — no real reservations.
         </p>
       ) : null}
 

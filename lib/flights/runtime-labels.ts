@@ -25,9 +25,9 @@ export function getFlightRuntimeLabels(): FlightRuntimeLabels {
       duffelMode,
       stripeMode,
       isProductionBooking: true,
-      searchHeadline: "Live flight search",
+      searchHeadline: "Search flights",
       searchSubline:
-        "Real fares and secure card checkout. Totals include our agency service fee before you pay.",
+        "Compare live fares from airlines. Prices shown include our service fee — what you see is what you pay.",
       bookingConfirmedTitle: "Booking confirmed",
     };
   }
