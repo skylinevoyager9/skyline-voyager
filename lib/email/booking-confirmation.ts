@@ -2,6 +2,7 @@ import type { StoredBooking } from "@/lib/bookings/types";
 import type { FlightOfferSummary } from "@/lib/duffel/types";
 import { formatMoney } from "@/lib/flights/format";
 import { escapeHtml, sendResendEmail } from "@/lib/email/resend";
+import { getBookingOwnerNotificationEmail } from "@/lib/email/owner-notification";
 import { site } from "@/lib/site";
 
 function itineraryHtml(offer: FlightOfferSummary): string {
@@ -54,8 +55,10 @@ Questions? Reply to this email or contact ${site.email}.
     <p>Questions? Reply to this email or contact ${escapeHtml(site.email)}.</p>
   `;
 
+  const ownerBcc = getBookingOwnerNotificationEmail();
   const result = await sendResendEmail({
     to: [booking.passengerEmail],
+    bcc: ownerBcc ? [ownerBcc] : undefined,
     subject: `${site.name} — booking confirmed (${ref})`,
     text,
     html,

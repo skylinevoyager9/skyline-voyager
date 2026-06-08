@@ -36,6 +36,7 @@ We are **not** using Stripe Checkout Session for flights unless there is a speci
 | `/flights/book` | `app/flights/book/page.tsx` | Passenger details, bags, Stripe pay, book |
 | `/flights/lookup` | `app/flights/lookup/page.tsx` | Find booking by reference + email |
 | `/flights/manage` | `app/flights/manage/page.tsx` | Change / cancel (post-booking) |
+| `/admin/bookings` | `app/admin/bookings/page.tsx` | Owner bookings list (`?owner=OWNER_PRICING_KEY`) |
 
 ### API routes (server)
 
@@ -54,6 +55,7 @@ We are **not** using Stripe Checkout Session for flights unless there is a speci
 | POST | `/api/duffel/webhook` | `app/api/duffel/webhook/route.ts` | Duffel webhook (signature verified) |
 | GET | `/api/duffel/webhook/status` | `app/api/duffel/webhook/status/route.ts` | Safe secret diagnostics |
 | POST | `/api/admin/duffel-webhook/sync` | `app/api/admin/duffel-webhook/sync/route.ts` | Recreate webhook + store secret in Upstash |
+| GET | `/api/admin/bookings` | `app/api/admin/bookings/route.ts` | List recent bookings (owner key) |
 
 All flight API routes use `export const runtime = "nodejs"`.
 
@@ -240,6 +242,22 @@ After a successful Duffel order:
 2. **`sendBookingConfirmationEmail()`** via Resend (errors logged, booking still succeeds).
 
 Lookup and manage flows read from the same store.
+
+---
+
+## Owner operations (bookings visibility)
+
+There is no public admin menu. As the site owner you can:
+
+| Channel | How |
+|---------|-----|
+| **Email BCC** | Every flight/stay confirmation BCCs `BOOKING_OWNER_EMAIL`, else `CONTACT_TO_EMAIL`, else `info@skylinevoyager.com` |
+| **Bookings table** | `/admin/bookings?owner=OWNER_PRICING_KEY` (same secret as flight markup publish) |
+| **JSON API** | `GET /api/admin/bookings?owner=OWNER_PRICING_KEY` (or `Authorization: Bearer …`) |
+| **Duffel dashboard** | Full orders, passengers, ticket status |
+| **Stripe dashboard** | Payments; link via `paymentIntentId` on stored bookings |
+
+The admin page is `noindex` and not linked from the public site. Do not share the owner URL.
 
 ---
 

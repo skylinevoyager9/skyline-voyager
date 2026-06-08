@@ -11,6 +11,7 @@ Enterprise-style Next.js site for **skylinevoyager.com**: topic hubs (flights, h
 | Doc | Purpose |
 |-----|---------|
 | [`docs/flight-booking-architecture.md`](docs/flight-booking-architecture.md) | **Source of truth** for the live flight booking system: API routes, PaymentIntent flow, server-side payment verification, Duffel balance ticketing, webhooks, and sequence diagrams. Update this file when booking implementation changes. |
+| [`/admin/bookings?owner=…`](https://skylinevoyager.com/admin/bookings) | **Owner bookings list** (requires `OWNER_PRICING_KEY` in URL — not linked from the public site). Confirmation emails BCC the owner inbox. |
 | [`.env.example`](.env.example) | Environment variable templates (Duffel, Stripe, Upstash, webhooks, affiliate URLs) |
 
 ---
@@ -75,7 +76,8 @@ Flights are searched and booked **on this site** (not via affiliate redirects). 
 | Owner | `OWNER_PRICING_KEY` — private URL `?owner=…` to publish live service fee |
 | Stripe | `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` |
 | Persistence (Vercel) | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
-| Email | `RESEND_API_KEY`, `CONTACT_TO_EMAIL` — booking confirmations |
+| Email | `RESEND_API_KEY`, `CONTACT_TO_EMAIL` — booking confirmations; optional `BOOKING_OWNER_EMAIL` for BCC |
+| Owner ops | `OWNER_PRICING_KEY` — `/admin/bookings?owner=…` and flight markup publish URL |
 
 **Routes:** `/flights/search` · `/flights/book` · `/flights/lookup`
 

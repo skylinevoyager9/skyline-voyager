@@ -147,6 +147,14 @@ function normalizeStoredBooking(b: StoredBooking): StoredBooking {
   return { ...b, product: b.product ?? "flight" };
 }
 
+export async function listRecentBookings(limit = 100): Promise<StoredBooking[]> {
+  const all = await loadAllBookings();
+  return all
+    .slice()
+    .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
+    .slice(0, Math.max(1, Math.min(limit, 200)));
+}
+
 export async function findBookingByOrderId(orderId: string): Promise<StoredBooking | null> {
   if (!orderId.startsWith("ord_")) return null;
 
