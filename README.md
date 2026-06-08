@@ -6,6 +6,15 @@ Enterprise-style Next.js site for **skylinevoyager.com**: topic hubs (flights, h
 
 ---
 
+## Documentation
+
+| Doc | Purpose |
+|-----|---------|
+| [`docs/flight-booking-architecture.md`](docs/flight-booking-architecture.md) | **Source of truth** for the live flight booking system: API routes, PaymentIntent flow, server-side payment verification, Duffel balance ticketing, webhooks, and sequence diagrams. Update this file when booking implementation changes. |
+| [`.env.example`](.env.example) | Environment variable templates (Duffel, Stripe, Upstash, webhooks, affiliate URLs) |
+
+---
+
 ## Start from zero (clone → run → deploy)
 
 ### 1. Clone into a path **without spaces** (recommended)
@@ -56,6 +65,8 @@ You do **not** need traditional “shared hosting” for this stack—Vercel *is
 ## Flight booking (Duffel + Stripe)
 
 Flights are searched and booked **on this site** (not via affiliate redirects). Copy `.env.example` → `.env.local`.
+
+**Architecture (read first):** [`docs/flight-booking-architecture.md`](docs/flight-booking-architecture.md) — route map, payment lifecycle, verification, webhooks, and end-to-end sequence. This documents what is **implemented today** (PaymentIntent + server-side verify on book), not a planned rewrite.
 
 | Area | Key variables |
 |------|----------------|
