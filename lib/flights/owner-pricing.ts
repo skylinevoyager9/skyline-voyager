@@ -3,10 +3,16 @@ import type { FlightOfferSummary, FlightSearchResponse } from "@/lib/duffel/type
 const OWNER_KEY_STORAGE = "sv_owner_pricing_key";
 
 /** Server-only secret — never use NEXT_PUBLIC_. */
+export function normalizeOwnerPricingKey(key: string | null | undefined): string {
+  return (key ?? "").trim().replace(/^["']|["']$/g, "");
+}
+
 export function isOwnerPricingKeyValid(key: string | null | undefined): boolean {
-  const secret = process.env.OWNER_PRICING_KEY?.trim();
-  if (!secret || !key?.trim()) return false;
-  return key.trim() === secret;
+  const secret = process.env.OWNER_PRICING_KEY?.trim().replace(/^["']|["']$/g, "");
+  if (!secret) return false;
+  const provided = normalizeOwnerPricingKey(key);
+  if (!provided) return false;
+  return provided === secret;
 }
 
 export function stripOwnerFieldsFromOffer(offer: FlightOfferSummary): FlightOfferSummary {
