@@ -2,7 +2,12 @@ import {
   duffelWebhookSecretLooksCorrupted,
   normalizeDuffelWebhookSecret,
 } from "@/lib/duffel/webhook-signature";
-import { fingerprintDuffelWebhookSecret, listDuffelWebhookSecrets } from "@/lib/duffel/webhook-secret-store";
+import {
+  fingerprintDuffelWebhookSecret,
+  getDuffelWebhookLastFailure,
+  getStoredDuffelWebhookEndpointId,
+  listDuffelWebhookSecrets,
+} from "@/lib/duffel/webhook-secret-store";
 import { getDuffelWebhookPublicUrl } from "@/lib/duffel/webhook-admin-service";
 import { isRedisKvConfigured } from "@/lib/storage/redis-kv";
 
@@ -15,10 +20,15 @@ export async function GET() {
   const primary = secrets[0] ?? "";
   const envSecret = normalizeDuffelWebhookSecret(process.env.DUFFEL_WEBHOOK_SECRET ?? "");
   const fingerprints = secrets.map((s) => fingerprintDuffelWebhookSecret(s));
+  const [storedEndpointId, lastFailure] = await Promise.all([
+    getStoredDuffelWebhookEndpointId(),
+    getDuffelWebhookLastFailure(),
+  ]);
 
   return Response.json({
     ok: true,
     webhookUrl: getDuffelWebhookPublicUrl(),
+    storedEndpointId,
     secretSources: {
       vercelEnv: Boolean(envSecret),
       upstash: isRedisKvConfigured(),
@@ -36,6 +46,8 @@ export async function GET() {
     secretFingerprint: primary ? fingerprintDuffelWebhookSecret(primary) : null,
     secretFingerprints: fingerprints,
     autoSyncAvailable: isRedisKvConfigured() && Boolean(process.env.DUFFEL_WEBHOOK_SETUP_KEY?.trim()),
+    lastFailure,
+    diagnosticsUrl: "/api/admin/duffel-webhook/diagnostics (Authorization: Bearer OWNER_PRICING_KEY)",
     hint: hintForStatus(secrets, primary, envSecret),
   });
 }
@@ -61,7 +73,7 @@ function hintForStatus(secrets: string[], primary: string, envSecret: string): s
     }
   }
   if (isRedisKvConfigured() && !envSecret) {
-    return "Using Upstash-stored secret only. If ping fails, POST /api/admin/duffel-webhook/sync with OWNER_PRICING_KEY.";
+    return "Using Upstash-stored secret only. Do not recreate the webhook manually in Duffel — run POST /api/admin/duffel-webhook/sync, then ping. Compare storedEndpointId with your Duffel webhook id.";
   }
   if (secrets.length > 1) {
     return "Two different secrets configured — delete DUFFEL_WEBHOOK_SECRET in Vercel or run auto-sync.";

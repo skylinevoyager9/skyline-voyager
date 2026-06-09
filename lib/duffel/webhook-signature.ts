@@ -1,22 +1,31 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { gunzipSync, gzipSync } from "node:zlib";
+import { constants as zlibConstants, gunzipSync, gzipSync } from "node:zlib";
 
 /** Normalize secret pasted from Duffel / Vercel (trim, strip quotes). */
 export function normalizeDuffelWebhookSecret(secret: string): string {
   return secret.trim().replace(/^["']|["']$/g, "");
 }
 
-function parseSignatureHeader(signatureHeader: string): { timestamp: string; v1: string } | null {
+/** Matches Duffel Ruby gem: `\At=(.+),v1=(.+)\z` (also accepts extra comma-separated fields). */
+export function parseDuffelSignatureHeader(
+  signatureHeader: string,
+): { timestamp: string; v1: string } | null {
+  const trimmed = signatureHeader.trim();
+  const strict = /^t=(\d+),v1=([a-f0-9]+)$/i.exec(trimmed);
+  if (strict) {
+    return { timestamp: strict[1]!, v1: strict[2]!.toLowerCase() };
+  }
+
   let timestamp = "";
   let v1 = "";
-  for (const part of signatureHeader.split(",")) {
-    const trimmed = part.trim();
-    const eq = trimmed.indexOf("=");
+  for (const part of trimmed.split(",")) {
+    const piece = part.trim();
+    const eq = piece.indexOf("=");
     if (eq === -1) continue;
-    const key = trimmed.slice(0, eq);
-    const value = trimmed.slice(eq + 1);
+    const key = piece.slice(0, eq);
+    const value = piece.slice(eq + 1).trim();
     if (key === "t") timestamp = value;
-    if (key === "v1") v1 = value;
+    if (key === "v1") v1 = value.toLowerCase();
   }
   if (!timestamp || !v1) return null;
   return { timestamp, v1 };
@@ -91,7 +100,6 @@ export function duffelWebhookBodyCandidates(
   const seen = new Set<string>();
   const out: Buffer[] = [];
   const add = (buf: Buffer) => {
-    if (buf.length === 0) return;
     const key = buf.toString("base64");
     if (seen.has(key)) return;
     seen.add(key);
@@ -105,8 +113,16 @@ export function duffelWebhookBodyCandidates(
 
   try {
     const text = rawBody.toString("utf8");
-    const reparsed = Buffer.from(JSON.stringify(JSON.parse(text)), "utf8");
+    const parsed = JSON.parse(text) as unknown;
+    const reparsed = Buffer.from(JSON.stringify(parsed), "utf8");
     if (!reparsed.equals(rawBody)) add(reparsed);
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      const sorted = Buffer.from(
+        JSON.stringify(parsed, Object.keys(parsed as object).sort()),
+        "utf8",
+      );
+      if (!sorted.equals(rawBody)) add(sorted);
+    }
   } catch {
     /* not JSON */
   }
@@ -120,8 +136,13 @@ export function duffelWebhookBodyCandidates(
     } catch {
       /* not gzip or already plain */
     }
+  }
+
+  // Duffel may sign gzip bytes while Vercel/proxies deliver decompressed JSON to the handler.
+  const gzipLevels = [zlibConstants.Z_DEFAULT_COMPRESSION, 1, 6, 9];
+  for (const level of gzipLevels) {
     try {
-      add(gzipSync(rawBody));
+      add(gzipSync(rawBody, { level }));
     } catch {
       /* ignore */
     }
@@ -142,18 +163,30 @@ function verifyWithPayload(
   return false;
 }
 
+function decodeVerifiedWebhookBody(body: Buffer): Buffer {
+  if (isGzipBytes(body)) {
+    try {
+      return gunzipSync(body);
+    } catch {
+      /* fall through */
+    }
+  }
+  return body;
+}
+
 /** Verify Duffel `X-Duffel-Signature` header (t=timestamp,v1=hex). */
 export function verifyDuffelWebhookSignature(
   secret: string,
   rawBody: Buffer,
   signatureHeader: string | null,
+  contentEncoding: string | null = null,
 ): boolean {
   if (!signatureHeader?.trim() || !secret.trim()) return false;
 
-  const parsed = parseSignatureHeader(signatureHeader);
+  const parsed = parseDuffelSignatureHeader(signatureHeader);
   if (!parsed) return false;
 
-  for (const payload of duffelWebhookBodyCandidates(rawBody, null)) {
+  for (const payload of duffelWebhookBodyCandidates(rawBody, contentEncoding)) {
     if (verifyWithPayload(secret, parsed.timestamp, parsed.v1, payload)) return true;
   }
   return false;
@@ -168,18 +201,14 @@ export function verifyDuffelWebhookRequest(
 ): Buffer | null {
   if (!signatureHeader?.trim() || secrets.length === 0) return null;
 
+  const parsed = parseDuffelSignatureHeader(signatureHeader);
+  if (!parsed) return null;
+
   const bodies = duffelWebhookBodyCandidates(rawBody, contentEncoding);
   for (const body of bodies) {
     for (const secret of secrets) {
-      if (!verifyDuffelWebhookSignature(secret, body, signatureHeader)) continue;
-      if (isGzipBytes(body)) {
-        try {
-          return gunzipSync(body);
-        } catch {
-          /* fall through */
-        }
-      }
-      return body;
+      if (!verifyWithPayload(secret, parsed.timestamp, parsed.v1, body)) continue;
+      return decodeVerifiedWebhookBody(body);
     }
   }
   return null;

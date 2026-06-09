@@ -9,11 +9,35 @@ import {
 import {
   fingerprintDuffelWebhookSecret,
   storeDuffelWebhookSecret,
+  storeDuffelWebhookEndpointId,
 } from "@/lib/duffel/webhook-secret-store";
 import { isRedisKvConfigured } from "@/lib/storage/redis-kv";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+async function pingDuffelWebhookWithRetries(
+  endpointId: string,
+  attempts = 4,
+  delayMs = 2000,
+): Promise<{ ok: boolean; attempts: number; lastStatus?: number }> {
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    if (attempt > 1) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    } else {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+    }
+    try {
+      await pingDuffelWebhook(endpointId);
+      return { ok: true, attempts: attempt };
+    } catch (err) {
+      if (!(err instanceof DuffelApiError) || err.status !== 422 || attempt === attempts) {
+        throw err;
+      }
+    }
+  }
+  return { ok: false, attempts, lastStatus: 422 };
+}
 
 /**
  * One-shot: recreate Duffel webhook via API, store secret in Upstash, trigger ping.
@@ -64,6 +88,8 @@ export async function POST(req: Request) {
       );
     }
 
+    await storeDuffelWebhookEndpointId(replaced.endpointId);
+
     const fingerprint = fingerprintDuffelWebhookSecret(replaced.secret);
     const base = {
       endpointId: replaced.endpointId,
@@ -72,18 +98,19 @@ export async function POST(req: Request) {
       deletedEndpointIds: replaced.deletedEndpointIds,
       secretFingerprint: fingerprint,
       storedInUpstash: true,
-      /** Paste into Vercel DUFFEL_WEBHOOK_SECRET if ping still fails (remove any old/wrong value first). */
+      /** For debugging only — secret is already in Upstash; do not paste into Vercel env. */
       duffelWebhookSecret: replaced.secret,
     };
 
     try {
-      await pingDuffelWebhook(replaced.endpointId);
+      const ping = await pingDuffelWebhookWithRetries(replaced.endpointId);
       return Response.json({
         ok: true,
         message:
-          "Webhook recreated, secret saved to Upstash, ping sent. Check Duffel delivery log for 200.",
+          "Webhook recreated, secret saved to Upstash, ping succeeded. Check Duffel delivery log for 200.",
+        pingAttempts: ping.attempts,
         ...base,
-        hint: "Remove DUFFEL_WEBHOOK_SETUP_KEY from Vercel when done. You may remove duffelWebhookSecret from logs after saving to Vercel.",
+        hint: "Secret lives in Upstash only — keep DUFFEL_WEBHOOK_SECRET unset in Vercel.",
       });
     } catch (pingErr) {
       if (pingErr instanceof DuffelApiError && pingErr.status === 422) {
@@ -92,11 +119,13 @@ export async function POST(req: Request) {
           partial: true,
           pingFailed: true,
           message:
-            "Webhook created and secret saved, but Duffel ping got a non-200 from your server. Update Vercel DUFFEL_WEBHOOK_SECRET using duffelWebhookSecret below, redeploy, then ping again in Duffel.",
+            "Webhook created and secret saved to Upstash. Auto-ping got a non-200 (often a short timing race). Ping manually in Duffel — the endpoint should work once Upstash is warm.",
           ...base,
           duffelStatus: pingErr.status,
           hint:
-            "1) Delete or replace DUFFEL_WEBHOOK_SECRET in Vercel with duffelWebhookSecret from this response. 2) Redeploy Production. 3) Duffel → Webhooks → Ping.",
+            "1) Do not set DUFFEL_WEBHOOK_SECRET in Vercel. 2) Duffel → Developers → Webhooks → Ping on endpoint " +
+            replaced.endpointId +
+            ". 3) Confirm https://skylinevoyager.com/api/duffel/webhook/status shows the same secretFingerprint.",
         });
       }
       throw pingErr;
