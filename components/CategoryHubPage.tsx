@@ -4,7 +4,7 @@ import { FlightSearchCard } from "@/components/flights/FlightSearchCard";
 import { StaysSearchCard } from "@/components/stays/StaysSearchCard";
 import { GuidePartnerStrip } from "@/components/GuidePartnerStrip";
 import { HubBookingDock } from "@/components/HubBookingDock";
-import { hubBookingEmphasis, usesDuffelStaysBooking, visiblePartnerKeys } from "@/lib/booking/platform";
+import { hubBookingEmphasis, usesDuffelStaysBooking } from "@/lib/booking/platform";
 import { shouldUseDuffelFlightSearch } from "@/lib/flights/links";
 import { GuideCardHero } from "@/components/GuideCardHero";
 import { HUB_THEME } from "@/lib/guides/hub-theme";
@@ -37,7 +37,9 @@ export function CategoryHubPage({
   const liveSearch = shouldUseDuffelFlightSearch();
   const liveStays = usesDuffelStaysBooking();
   const showFlightCard =
-    liveSearch && (showLiveFlightSearch || !visiblePartnerKeys().includes("booking"));
+    liveSearch &&
+    (showLiveFlightSearch || category === "flights" || category === "weekends");
+  const isProductHub = category === "flights" || category === "hotels" || category === "cars";
   const showStaysCard = liveStays && showLiveStaysSearch && category === "hotels";
   const posts = getGuidesByCategory(category).sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
@@ -66,15 +68,24 @@ export function CategoryHubPage({
             <Link href="/" className="font-medium hover:text-white hover:underline">
               Home
             </Link>
-            <span className="mx-2 text-white/35">/</span>
-            <Link
-              href="/guides"
-              className="font-medium hover:text-white hover:underline"
-            >
-              Guides
-            </Link>
-            <span className="mx-2 text-white/35">/</span>
-            <span className="text-white/90">{meta.shortTitle}</span>
+            {isProductHub ? (
+              <>
+                <span className="mx-2 text-white/35">/</span>
+                <span className="text-white/90">{meta.shortTitle}</span>
+              </>
+            ) : (
+              <>
+                <span className="mx-2 text-white/35">/</span>
+                <Link
+                  href="/guides"
+                  className="font-medium hover:text-white hover:underline"
+                >
+                  Guides
+                </Link>
+                <span className="mx-2 text-white/35">/</span>
+                <span className="text-white/90">{meta.shortTitle}</span>
+              </>
+            )}
           </nav>
 
           <p className="mt-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-amber-100/95 backdrop-blur-sm">
@@ -134,7 +145,9 @@ export function CategoryHubPage({
             <p className="mt-2 max-w-xl text-stone-600">
               {category === "hotels"
                 ? "Written for travelers choosing where to sleep—neighborhood fit, total nightly cost after fees, and how to compare booking paths without guesswork."
-                : "Written for travelers who read the fine print—fees, timing, cabin choice, and where quality actually shows up."}
+                : category === "cars"
+                  ? "Written for road-trippers and business travelers—insurance, one-way fees, airport pickup, and when premium classes are worth it."
+                  : "Written for travelers who read the fine print—fees, timing, cabin choice, and where quality actually shows up."}
             </p>
           </div>
           <Link
@@ -223,11 +236,15 @@ export function CategoryHubPage({
           <div className="mb-12 space-y-6">{prePartnerSlot}</div>
         ) : null}
         <GuidePartnerStrip
-          emphasizePartner="flights"
+          emphasizePartner={emphasis}
           title={
-            liveSearch
+            emphasis === "flights" && liveSearch
               ? "Book flights on Skyline Voyager"
-              : "Private search — complete checkout on partner sites"
+              : emphasis === "cars"
+                ? "Compare rental cars on partner sites"
+                : emphasis === "viator"
+                  ? "Book tours & park access on partner sites"
+                  : "Private search — complete checkout on partner sites"
           }
           className="mt-0"
           sectionId="book-trip"

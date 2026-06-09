@@ -28,8 +28,9 @@ export function visiblePartnerKeys(): PartnerKey[] {
 
 /** Which partner pill is primary on category hubs. */
 export function hubBookingEmphasis(category: GuideCategory): PartnerKey {
-  if (!isHotelOtaPartnerEnabled()) {
+  const emphasis = HUB_EMPHASIS[category];
+  if (!isHotelOtaPartnerEnabled() && emphasis === "booking") {
     return "flights";
   }
-  return HUB_EMPHASIS[category];
+  return emphasis;
 }
