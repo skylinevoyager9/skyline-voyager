@@ -13,7 +13,7 @@ export async function postSignedWebhook(
   secret: string,
 ): Promise<{ status: number; response: string }> {
   const timestamp = Math.floor(Date.now() / 1000).toString();
-  const signature = `t=${timestamp},v1=${signBody(secret, timestamp, body)}`;
+  const signature = `t=${timestamp},v2=${signBody(secret, timestamp, body)}`;
   const res = await fetch(getDuffelWebhookPublicUrl(), {
     method: "POST",
     headers: {

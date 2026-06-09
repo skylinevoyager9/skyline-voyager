@@ -6,29 +6,39 @@ export function normalizeDuffelWebhookSecret(secret: string): string {
   return secret.trim().replace(/^["']|["']$/g, "");
 }
 
-/** Matches Duffel Ruby gem: `\At=(.+),v1=(.+)\z` (also accepts extra comma-separated fields). */
+/**
+ * Parse Duffel `X-Duffel-Signature`.
+ * Live webhooks use `t=<unix>,v2=<hex>`; older docs/examples use `v1`.
+ */
 export function parseDuffelSignatureHeader(
   signatureHeader: string,
 ): { timestamp: string; v1: string } | null {
   const trimmed = signatureHeader.trim();
-  const strict = /^t=(\d+),v1=([a-f0-9]+)$/i.exec(trimmed);
-  if (strict) {
-    return { timestamp: strict[1]!, v1: strict[2]!.toLowerCase() };
+  const strictV2 = /^t=(\d+),v2=([a-f0-9]+)$/i.exec(trimmed);
+  if (strictV2) {
+    return { timestamp: strictV2[1]!, v1: strictV2[2]!.toLowerCase() };
+  }
+  const strictV1 = /^t=(\d+),v1=([a-f0-9]+)$/i.exec(trimmed);
+  if (strictV1) {
+    return { timestamp: strictV1[1]!, v1: strictV1[2]!.toLowerCase() };
   }
 
   let timestamp = "";
+  let v2 = "";
   let v1 = "";
   for (const part of trimmed.split(",")) {
     const piece = part.trim();
     const eq = piece.indexOf("=");
     if (eq === -1) continue;
     const key = piece.slice(0, eq);
-    const value = piece.slice(eq + 1).trim();
+    const value = piece.slice(eq + 1).trim().toLowerCase();
     if (key === "t") timestamp = value;
-    if (key === "v1") v1 = value.toLowerCase();
+    if (key === "v2") v2 = value;
+    if (key === "v1") v1 = value;
   }
-  if (!timestamp || !v1) return null;
-  return { timestamp, v1 };
+  const signature = v2 || v1;
+  if (!timestamp || !signature) return null;
+  return { timestamp, v1: signature };
 }
 
 /**
@@ -209,7 +219,7 @@ function decodeVerifiedWebhookBody(body: Buffer): Buffer {
   return body;
 }
 
-/** Verify Duffel `X-Duffel-Signature` header (t=timestamp,v1=hex). */
+/** Verify Duffel `X-Duffel-Signature` header (t=timestamp,v2=hex or v1=hex). */
 export function verifyDuffelWebhookSignature(
   secret: string,
   rawBody: Buffer,
