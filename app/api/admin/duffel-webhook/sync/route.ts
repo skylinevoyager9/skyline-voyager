@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     return Response.json(
       {
         ok: false,
-        error: "Unauthorized. Set DUFFEL_WEBHOOK_SETUP_KEY and send Authorization: Bearer <key>.",
+        error: "Unauthorized. Send Authorization: Bearer <DUFFEL_WEBHOOK_SETUP_KEY or OWNER_PRICING_KEY>.",
       },
       { status: 401 },
     );

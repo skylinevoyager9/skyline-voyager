@@ -53,11 +53,18 @@ function hintForStatus(secrets: string[], primary: string, envSecret: string): s
   if (primary.startsWith("end_")) {
     return "You pasted the webhook id. Use the secret string from Duffel.";
   }
+  if (isRedisKvConfigured() && envSecret && primary) {
+    const envFp = fingerprintDuffelWebhookSecret(envSecret);
+    const activeFp = fingerprintDuffelWebhookSecret(primary);
+    if (envFp !== activeFp) {
+      return "Upstash secret is active; Vercel DUFFEL_WEBHOOK_SECRET is stale — delete it. If ping fails, POST /api/admin/duffel-webhook/sync with OWNER_PRICING_KEY, then ping in Duffel.";
+    }
+  }
   if (isRedisKvConfigured() && !envSecret) {
-    return "Using Upstash-stored secret only. If ping fails, POST /api/admin/duffel-webhook/sync.";
+    return "Using Upstash-stored secret only. If ping fails, POST /api/admin/duffel-webhook/sync with OWNER_PRICING_KEY.";
   }
   if (secrets.length > 1) {
-    return "Two different secrets in env vs Upstash — delete DUFFEL_WEBHOOK_SECRET in Vercel (keep Upstash only) or make them identical, redeploy, then ping.";
+    return "Two different secrets configured — delete DUFFEL_WEBHOOK_SECRET in Vercel or run auto-sync.";
   }
-  return "Secret is set. If ping fails, POST /api/admin/duffel-webhook/sync (recommended) or recreate webhook in Duffel.";
+  return "Secret is set. If ping fails, POST /api/admin/duffel-webhook/sync with OWNER_PRICING_KEY.";
 }

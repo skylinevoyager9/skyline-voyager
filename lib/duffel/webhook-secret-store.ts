@@ -9,25 +9,17 @@ export function fingerprintDuffelWebhookSecret(secret: string): string {
   return createHash("sha256").update(normalizeDuffelWebhookSecret(secret)).digest("hex").slice(0, 12);
 }
 
-/** All secrets to try when verifying (env + KV, deduped). */
+/** Secrets for verification — Upstash (auto-sync) wins over Vercel env when both exist. */
 export async function listDuffelWebhookSecrets(): Promise<string[]> {
-  const out: string[] = [];
-  const seen = new Set<string>();
-
-  const add = (raw: string | null | undefined) => {
-    const n = normalizeDuffelWebhookSecret(raw ?? "");
-    if (!n || seen.has(n)) return;
-    seen.add(n);
-    out.push(n);
-  };
-
-  // Upstash (from auto-sync) is authoritative — try before stale Vercel env.
   if (isRedisKvConfigured()) {
-    add(await kvGet(DUFFEL_WEBHOOK_SECRET_KV_KEY));
+    const kv = normalizeDuffelWebhookSecret(
+      (await kvGet(DUFFEL_WEBHOOK_SECRET_KV_KEY)) ?? "",
+    );
+    if (kv) return [kv];
   }
-  add(process.env.DUFFEL_WEBHOOK_SECRET);
 
-  return out;
+  const env = normalizeDuffelWebhookSecret(process.env.DUFFEL_WEBHOOK_SECRET ?? "");
+  return env ? [env] : [];
 }
 
 export async function storeDuffelWebhookSecret(secret: string): Promise<{

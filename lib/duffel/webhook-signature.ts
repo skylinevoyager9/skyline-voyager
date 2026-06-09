@@ -103,6 +103,14 @@ export function duffelWebhookBodyCandidates(
     add(rawBody.subarray(0, rawBody.length - 1));
   }
 
+  try {
+    const text = rawBody.toString("utf8");
+    const reparsed = Buffer.from(JSON.stringify(JSON.parse(text)), "utf8");
+    if (!reparsed.equals(rawBody)) add(reparsed);
+  } catch {
+    /* not JSON */
+  }
+
   const ce = contentEncoding?.toLowerCase() ?? "";
   const treatAsGzip = ce.includes("gzip") || isGzipBytes(rawBody);
 
@@ -163,7 +171,15 @@ export function verifyDuffelWebhookRequest(
   const bodies = duffelWebhookBodyCandidates(rawBody, contentEncoding);
   for (const body of bodies) {
     for (const secret of secrets) {
-      if (verifyDuffelWebhookSignature(secret, body, signatureHeader)) return body;
+      if (!verifyDuffelWebhookSignature(secret, body, signatureHeader)) continue;
+      if (isGzipBytes(body)) {
+        try {
+          return gunzipSync(body);
+        } catch {
+          /* fall through */
+        }
+      }
+      return body;
     }
   }
   return null;
