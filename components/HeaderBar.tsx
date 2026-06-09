@@ -4,44 +4,32 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { SiteSearchForm } from "@/components/SiteSearchForm";
-import { DESTINATION_META } from "@/lib/guides";
-import { CATEGORY_META } from "@/lib/guides/types";
+import { PRODUCT_NAV } from "@/lib/site-nav";
 import { site } from "@/lib/site";
 
-const PRIMARY_NAV = [
-  { href: "/hotels", label: "Hotels & stays" },
-  { href: "/flights", label: "Flights", flights: true },
-  { href: "/weekend-trips", label: "Weekends" },
-  { href: "/national-parks", label: "Parks" },
-  { href: "/car-rentals", label: "Cars" },
-  { href: "/travel-planning", label: "Planning" },
-  { href: "/guides", label: "All guides" },
-  { href: "/destinations", label: "Destinations" },
-];
-
-const secondary = [
-  { href: "/about#how-it-works", label: "How it works" },
-  { href: "/about", label: "About" },
-  { href: "/legal", label: "Legal" },
-];
-
 type HeaderBarProps = {
-  /** `/flights/search` when Duffel is configured, else `/flights`. */
   flightsHref?: string;
+  staysHref?: string;
 };
 
-export function HeaderBar({ flightsHref = "/flights" }: HeaderBarProps) {
+export function HeaderBar({
+  flightsHref = "/flights",
+  staysHref = "/hotels",
+}: HeaderBarProps) {
   const [open, setOpen] = useState(false);
-  const primary = PRIMARY_NAV.map((item) =>
-    item.flights ? { href: flightsHref, label: item.label } : { href: item.href, label: item.label },
-  );
+
+  const primary = PRODUCT_NAV.map((item) => {
+    if (item.id === "flights") return { href: flightsHref, label: item.label };
+    if (item.id === "stays") return { href: staysHref, label: item.label };
+    return { href: item.href, label: item.label };
+  });
 
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-surface)]/95 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:gap-3 sm:px-6 lg:max-w-7xl lg:gap-4">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
         <Link
           href="/"
-          className="flex min-w-0 shrink-0 items-center gap-2 font-display text-lg font-semibold tracking-tight text-[var(--color-ink)] lg:gap-1.5 xl:gap-2.5"
+          className="flex min-w-0 shrink-0 items-center gap-2.5 font-display text-lg font-semibold tracking-tight text-[var(--color-ink)]"
         >
           <span className="sr-only">{site.name}</span>
           <Image
@@ -52,75 +40,36 @@ export function HeaderBar({ flightsHref = "/flights" }: HeaderBarProps) {
             className="h-9 w-auto shrink-0 object-contain object-left"
             priority
           />
-          {/* Visual wordmark only; sr-only duplicate keeps a11y stable (avoids display:none + hydration quirks). */}
-          <span
-            aria-hidden
-            className="truncate lg:hidden xl:inline xl:max-w-[11rem] 2xl:max-w-none"
-          >
-            {site.name}
-          </span>
+          <span className="hidden truncate sm:inline">{site.name}</span>
         </Link>
 
-        {/*
-          Flex cluster (not CSS grid): fixed-width search + nav are siblings with gap,
-          so the search field cannot paint over the first nav links.
-        */}
-        <div className="hidden min-h-10 min-w-0 flex-1 items-center justify-end gap-3 sm:gap-4 md:flex">
-          <div className="w-full min-w-0 max-w-[15rem] shrink-0 sm:max-w-[16rem] xl:max-w-[17rem]">
-            <SiteSearchForm
-              compact
-              iconSubmit
-              inputId="header-site-search"
-              className="w-full"
-            />
-          </div>
-          <nav
-            className="hidden min-h-10 min-w-0 lg:flex lg:flex-1 lg:flex-nowrap lg:items-center lg:justify-end lg:gap-x-0.5 lg:overflow-x-auto lg:overflow-y-hidden lg:whitespace-nowrap lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden xl:gap-x-1"
-            aria-label="Main"
-          >
-          <Link
-            href="/"
-            className="shrink-0 rounded-md px-1.5 py-2 text-xs font-medium text-[var(--color-ink-muted)] transition hover:bg-black/[0.04] hover:text-[var(--color-ink)] xl:px-2 xl:text-sm"
-          >
-            Home
-          </Link>
+        <nav
+          className="hidden items-center gap-1 md:flex"
+          aria-label="Main"
+        >
           {primary.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="shrink-0 rounded-md px-1.5 py-2 text-xs font-medium text-[var(--color-ink-muted)] transition hover:bg-black/[0.04] hover:text-[var(--color-ink)] xl:px-2 xl:text-sm"
+              className="rounded-full px-4 py-2 text-sm font-semibold text-[var(--color-ink-muted)] transition hover:bg-black/[0.04] hover:text-[var(--color-ink)]"
             >
               {item.label}
             </Link>
           ))}
-          {secondary.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="shrink-0 rounded-md px-1.5 py-2 text-xs font-medium text-[var(--color-ink-muted)] transition hover:bg-black/[0.04] hover:text-[var(--color-ink)] xl:px-2 xl:text-sm"
-            >
-              {item.label}
-            </Link>
-          ))}
-          </nav>
-        </div>
+        </nav>
 
-        <Link
-          href="/search"
-          className="rounded-lg px-2 py-2 text-sm font-medium text-[var(--color-ink-muted)] transition hover:bg-black/[0.04] hover:text-[var(--color-ink)] md:hidden"
-        >
-          Search
-        </Link>
+        <div className="hidden w-full max-w-[14rem] md:block lg:max-w-[16rem]">
+          <SiteSearchForm compact iconSubmit inputId="header-site-search" className="w-full" />
+        </div>
 
         <button
           type="button"
-          className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--color-border)] text-[var(--color-ink)] lg:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--color-border)] text-[var(--color-ink)] md:hidden"
           aria-expanded={open}
           aria-controls="mobile-nav"
           aria-label={open ? "Close menu" : "Open menu"}
           onClick={() => setOpen((o) => !o)}
         >
-          <span className="sr-only">Menu</span>
           {open ? (
             <span className="text-xl leading-none">×</span>
           ) : (
@@ -136,83 +85,35 @@ export function HeaderBar({ flightsHref = "/flights" }: HeaderBarProps) {
       {open ? (
         <div
           id="mobile-nav"
-          className="border-t border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4 lg:hidden"
+          className="border-t border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4 md:hidden"
         >
-          <div className="mx-auto flex max-w-6xl flex-col gap-1">
-            <div className="mb-3 border-b border-[var(--color-border)] pb-4">
-              <SiteSearchForm
-                compact
-                inputId="mobile-drawer-site-search"
-                className="w-full"
-              />
-            </div>
-            <Link
-              href="/"
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--color-ink)] hover:bg-black/[0.04]"
-              onClick={() => setOpen(false)}
-            >
-              Home
-            </Link>
-            <p className="px-3 pt-2 text-xs font-semibold uppercase tracking-wide text-[var(--color-ink-faint)]">
-              Topics
-            </p>
-            {CATEGORY_META.map((c) => (
-              <Link
-                key={c.id}
-                href={c.id === "flights" ? flightsHref : c.path}
-                className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--color-ink-muted)] hover:bg-black/[0.04] hover:text-[var(--color-ink)]"
-                onClick={() => setOpen(false)}
-              >
-                <span className="mr-2" aria-hidden>
-                  {c.icon}
-                </span>
-                {c.shortTitle}
-              </Link>
-            ))}
-            <Link
-              href="/guides"
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--color-ink-muted)] hover:bg-black/[0.04]"
-              onClick={() => setOpen(false)}
-            >
-              All guides
-            </Link>
-            <p className="px-3 pt-3 text-xs font-semibold uppercase tracking-wide text-[var(--color-ink-faint)]">
-              Destinations
-            </p>
-            {DESTINATION_META.map((d) => (
-              <Link
-                key={d.id}
-                href={d.path}
-                className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--color-ink-muted)] hover:bg-black/[0.04] hover:text-[var(--color-ink)]"
-                onClick={() => setOpen(false)}
-              >
-                <span className="mr-2" aria-hidden>
-                  {d.icon}
-                </span>
-                {d.shortTitle}
-              </Link>
-            ))}
-            <Link
-              href="/destinations"
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--color-accent)] hover:bg-black/[0.04]"
-              onClick={() => setOpen(false)}
-            >
-              All destinations →
-            </Link>
-            <p className="px-3 pt-3 text-xs font-semibold uppercase tracking-wide text-[var(--color-ink-faint)]">
-              Company
-            </p>
-            {secondary.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--color-ink-muted)] hover:bg-black/[0.04]"
-                onClick={() => setOpen(false)}
-              >
-                {item.label}
-              </Link>
-            ))}
+          <div className="mb-4">
+            <SiteSearchForm compact inputId="mobile-drawer-site-search" className="w-full" />
           </div>
+          {primary.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="block rounded-lg px-3 py-3 text-base font-semibold text-[var(--color-ink)] hover:bg-black/[0.04]"
+              onClick={() => setOpen(false)}
+            >
+              {item.label}
+            </Link>
+          ))}
+          <Link
+            href="/guides"
+            className="mt-2 block rounded-lg px-3 py-3 text-sm font-medium text-[var(--color-ink-muted)] hover:bg-black/[0.04]"
+            onClick={() => setOpen(false)}
+          >
+            Travel guides
+          </Link>
+          <Link
+            href="/about"
+            className="block rounded-lg px-3 py-3 text-sm font-medium text-[var(--color-ink-muted)] hover:bg-black/[0.04]"
+            onClick={() => setOpen(false)}
+          >
+            About
+          </Link>
         </div>
       ) : null}
     </header>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { GuideMapEmbed } from "@/components/GuideMapEmbed";
 import { GuideArticleHeader } from "@/components/GuideArticleHeader";
 import { GuideArticleJsonLd } from "@/components/GuideArticleJsonLd";
 import { GuideArticlePartnerNote } from "@/components/GuideArticlePartnerNote";
@@ -21,6 +22,7 @@ import {
 } from "@/lib/guides";
 import { hubBookingEmphasis } from "@/lib/booking/platform";
 import { hasAnyAffiliateTracking } from "@/lib/partner-links";
+import { ROAD_TRIP_MAPS } from "@/lib/guides/road-trip-maps";
 import { site } from "@/lib/site";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -66,6 +68,7 @@ export default async function GuidePage({ params }: Props) {
   const toc = getGuideToc(guide.body);
   const related = getRelatedGuides(guide, 4);
   const pageUrl = `${site.url}/guides/${guide.slug}`;
+  const routeMap = ROAD_TRIP_MAPS[guide.slug];
 
   return (
     <main className="bg-stone-100">
@@ -102,6 +105,13 @@ export default async function GuidePage({ params }: Props) {
                 In this guide
               </p>
               <GuideArticlePartnerNote />
+              {routeMap ? (
+                <GuideMapEmbed
+                  title={routeMap.title}
+                  embedSrc={routeMap.embedSrc}
+                  openInMapsHref={routeMap.openInMapsHref}
+                />
+              ) : null}
               <GuideBody markdown={guide.body} />
             </div>
             <GuideRelated guides={related} />

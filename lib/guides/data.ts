@@ -1,4 +1,5 @@
 import type { Guide } from "./types";
+import { roadTripGuides } from "./road-trip-posts";
 
 export const guides: Guide[] = [
   {
@@ -843,4 +844,5 @@ Continue with [national parks overview](/guides/national-parks-trip-overview), [
 Partner links may support our work at no extra cost to you. [Affiliate disclosure](/affiliate-disclosure).
     `.trim(),
   },
+  ...roadTripGuides,
 ];

@@ -1,14 +1,25 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CATEGORY_META, DESTINATION_META } from "@/lib/guides";
+import { PRODUCT_NAV, FOOTER_COMPANY_LINKS, FOOTER_LEGAL_LINKS } from "@/lib/site-nav";
+import { getFlightsNavHref } from "@/lib/flights/links";
+import { getStaysNavHref } from "@/lib/stays/links";
 import { site } from "@/lib/site";
 
 export function SiteFooter() {
+  const flightsHref = getFlightsNavHref();
+  const staysHref = getStaysNavHref();
+
+  const products = PRODUCT_NAV.map((item) => {
+    if (item.id === "flights") return { href: flightsHref, label: item.label };
+    if (item.id === "stays") return { href: staysHref, label: item.label };
+    return { href: item.href, label: item.label };
+  });
+
   return (
     <footer className="mt-auto border-t border-[var(--color-border)] bg-[var(--color-surface-warm)]">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          <div className="lg:col-span-1">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="sm:col-span-2 lg:col-span-1">
             <Link
               href="/"
               className="inline-flex items-center gap-2.5 font-display text-base font-semibold text-[var(--color-ink)] hover:opacity-90"
@@ -23,15 +34,13 @@ export function SiteFooter() {
               {site.name}
             </Link>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-[var(--color-ink-muted)]">
-              Independent US travel guides with a stays-first lens—hotels and
-              lodging, then flights, weekends, parks, and planning—plus select
-              international frames. We may earn a commission from partner
-              links—see our{" "}
+              Book flights, stays, and cars — plus USA road-trip guides. We may earn a
+              commission from partner links.{" "}
               <Link
                 href="/affiliate-disclosure"
                 className="text-[var(--color-accent)] underline-offset-2 hover:underline"
               >
-                affiliate disclosure
+                Disclosure
               </Link>
               .
             </p>
@@ -45,56 +54,27 @@ export function SiteFooter() {
 
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-ink-faint)]">
-              Topics
+              Book
             </p>
             <ul className="mt-4 space-y-2 text-sm">
-              {CATEGORY_META.map((c) => (
-                <li key={c.path}>
+              {products.map((p) => (
+                <li key={p.href}>
                   <Link
-                    href={c.path}
+                    href={p.href}
                     className="text-[var(--color-ink-muted)] hover:text-[var(--color-accent)]"
                   >
-                    {c.title}
+                    {p.label}
                   </Link>
                 </li>
               ))}
               <li>
                 <Link
                   href="/guides"
-                  className="font-medium text-[var(--color-accent)] hover:underline"
+                  className="text-[var(--color-ink-muted)] hover:text-[var(--color-accent)]"
                 >
-                  All guides →
+                  Travel guides
                 </Link>
               </li>
-            </ul>
-          </div>
-
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-ink-faint)]">
-              Destinations
-            </p>
-            <ul className="mt-4 space-y-2 text-sm">
-              <li>
-                <Link
-                  href="/destinations"
-                  className="font-medium text-[var(--color-accent)] hover:underline"
-                >
-                  All destinations →
-                </Link>
-              </li>
-              {DESTINATION_META.map((d) => (
-                <li key={d.id}>
-                  <Link
-                    href={d.path}
-                    className="text-[var(--color-ink-muted)] hover:text-[var(--color-accent)]"
-                  >
-                    <span className="mr-1.5" aria-hidden>
-                      {d.icon}
-                    </span>
-                    {d.shortTitle}
-                  </Link>
-                </li>
-              ))}
             </ul>
           </div>
 
@@ -103,32 +83,13 @@ export function SiteFooter() {
               Company
             </p>
             <ul className="mt-4 space-y-2 text-sm text-[var(--color-ink-muted)]">
-              <li>
-                <Link href="/about" className="hover:text-[var(--color-accent)]">
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/about#how-it-works"
-                  className="hover:text-[var(--color-accent)]"
-                >
-                  How it works
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/about#partnerships"
-                  className="hover:text-[var(--color-accent)]"
-                >
-                  Partnerships &amp; press
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-[var(--color-accent)]">
-                  Contact
-                </Link>
-              </li>
+              {FOOTER_COMPANY_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="hover:text-[var(--color-accent)]">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -137,29 +98,13 @@ export function SiteFooter() {
               Legal
             </p>
             <ul className="mt-4 space-y-2 text-sm text-[var(--color-ink-muted)]">
-              <li>
-                <Link href="/legal" className="hover:text-[var(--color-accent)]">
-                  Legal overview
-                </Link>
-              </li>
-              <li>
-                <Link href="/privacy" className="hover:text-[var(--color-accent)]">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="hover:text-[var(--color-accent)]">
-                  Terms &amp; Conditions
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/affiliate-disclosure"
-                  className="hover:text-[var(--color-accent)]"
-                >
-                  Affiliate Disclosure
-                </Link>
-              </li>
+              {FOOTER_LEGAL_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="hover:text-[var(--color-accent)]">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

@@ -44,6 +44,11 @@ const BY_SLUG: Record<string, string> = {
   "ota-vs-direct-hotel-booking-us": `https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?${Q}`,
   "us-city-neighborhood-stay-framework": `https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?${Q}`,
   "road-trip-lodging-strategy-usa": `https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?${Q}`,
+  "pacific-coast-highway-road-trip-7-days": `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?${Q}`,
+  "grand-canyon-las-vegas-road-trip-route": `https://images.unsplash.com/photo-1501785888041-af3ef285b470?${Q}`,
+  "west-coast-road-trip-san-francisco-los-angeles": `https://images.unsplash.com/photo-1449824913935-59a10b8d2000?${Q}`,
+  "east-coast-road-trip-nyc-to-miami": `https://images.unsplash.com/photo-1485871981521-5b1fd380cffe?${Q}`,
+  "southwest-road-trip-denver-grand-canyon-phoenix": `https://images.unsplash.com/photo-1472214103451-9374bd1c798e?${Q}`,
 };
 
 export function guideCoverImageSrc(guide: Guide): string {
