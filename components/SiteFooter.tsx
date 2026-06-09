@@ -1,6 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { PRODUCT_NAV, FOOTER_COMPANY_LINKS, FOOTER_LEGAL_LINKS } from "@/lib/site-nav";
+import {
+  GUIDE_NAV,
+  PRODUCT_NAV,
+  FOOTER_COMPANY_LINKS,
+  FOOTER_LEGAL_LINKS,
+} from "@/lib/site-nav";
 import { getFlightsNavHref } from "@/lib/flights/links";
 import { getStaysNavHref } from "@/lib/stays/links";
 import { site } from "@/lib/site";
@@ -69,10 +74,10 @@ export function SiteFooter() {
               ))}
               <li>
                 <Link
-                  href="/guides"
+                  href={GUIDE_NAV.href}
                   className="text-[var(--color-ink-muted)] hover:text-[var(--color-accent)]"
                 >
-                  Travel guides
+                  {GUIDE_NAV.label}
                 </Link>
               </li>
             </ul>

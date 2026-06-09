@@ -5,6 +5,12 @@ export const PRODUCT_NAV = [
   { id: "cars", href: "/car-rentals", label: "Cars" },
 ] as const;
 
+/** USA road-trip guides hub (featured SEO itineraries). */
+export const GUIDE_NAV = {
+  href: "/guides?cat=planning",
+  label: "Road trips",
+} as const;
+
 export const FOOTER_COMPANY_LINKS = [
   { href: "/about", label: "About" },
   { href: "/about#how-it-works", label: "How it works" },

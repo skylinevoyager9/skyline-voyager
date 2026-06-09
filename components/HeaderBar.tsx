@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { SiteSearchForm } from "@/components/SiteSearchForm";
-import { PRODUCT_NAV } from "@/lib/site-nav";
+import { GUIDE_NAV, PRODUCT_NAV } from "@/lib/site-nav";
 import { site } from "@/lib/site";
 
 type HeaderBarProps = {
@@ -56,6 +56,12 @@ export function HeaderBar({
               {item.label}
             </Link>
           ))}
+          <Link
+            href={GUIDE_NAV.href}
+            className="rounded-full px-4 py-2 text-sm font-semibold text-[var(--color-ink-muted)] transition hover:bg-black/[0.04] hover:text-[var(--color-ink)]"
+          >
+            {GUIDE_NAV.label}
+          </Link>
         </nav>
 
         <div className="hidden w-full max-w-[14rem] md:block lg:max-w-[16rem]">
@@ -101,11 +107,11 @@ export function HeaderBar({
             </Link>
           ))}
           <Link
-            href="/guides"
-            className="mt-2 block rounded-lg px-3 py-3 text-sm font-medium text-[var(--color-ink-muted)] hover:bg-black/[0.04]"
+            href={GUIDE_NAV.href}
+            className="mt-2 block rounded-lg px-3 py-3 text-base font-semibold text-[var(--color-ink)] hover:bg-black/[0.04]"
             onClick={() => setOpen(false)}
           >
-            Travel guides
+            {GUIDE_NAV.label}
           </Link>
           <Link
             href="/about"
