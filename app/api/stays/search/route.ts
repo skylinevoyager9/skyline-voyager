@@ -78,7 +78,7 @@ export async function POST(req: Request) {
       duffelDetail.includes("not enabled") ||
       duffelDetail.includes("contact sales");
     const message = staysNotEnabled
-      ? "Duffel Stays is not enabled on your account yet. Email support@duffel.com or use https://duffel.com/contact-us — there is no self-serve toggle in the dashboard."
+      ? "Duffel Stays is not enabled on your account yet. Email help@duffel.com or use https://duffel.com/contact-us — there is no self-serve toggle in the dashboard."
       : mapped.error;
     return Response.json(
       {

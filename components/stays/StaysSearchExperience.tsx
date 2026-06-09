@@ -238,10 +238,10 @@ export function StaysSearchExperience({ configured }: Props) {
                 Duffel replied: this feature is not enabled for your account. Flights can work
                 while Stays is off. Contact{" "}
                 <a
-                  href="mailto:support@duffel.com"
+                  href="mailto:help@duffel.com"
                   className="font-semibold underline underline-offset-2"
                 >
-                  support@duffel.com
+                  help@duffel.com
                 </a>{" "}
                 or{" "}
                 <a
