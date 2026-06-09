@@ -92,6 +92,37 @@ function isGzipBytes(buf: Buffer): boolean {
   return buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b;
 }
 
+/** Duffel webhook JSON shapes (docs sample + API event fields). */
+export function duffelEventJsonVariants(event: Record<string, unknown>): Buffer[] {
+  const seen = new Set<string>();
+  const out: Buffer[] = [];
+  const addObj = (value: Record<string, unknown>) => {
+    const buf = Buffer.from(JSON.stringify(value), "utf8");
+    const key = buf.toString("base64");
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push(buf);
+  };
+
+  addObj(event);
+  addObj({ updated_at: null, inserted_at: null, ...event });
+
+  const createdAt = event.created_at;
+  if (typeof createdAt === "string" && createdAt.includes("T")) {
+    addObj({
+      ...event,
+      created_at: createdAt.replace("T", " ").replace("Z", "+00:00"),
+    });
+  }
+
+  if (event.data && typeof event.data === "object" && event.data !== null) {
+    addObj({ ...event, data: {} });
+    addObj({ ...event, data: { object: {} } });
+  }
+
+  return out;
+}
+
 /** Raw body variants (gzip / trailing newline) — Duffel signs exact bytes sent on the wire. */
 export function duffelWebhookBodyCandidates(
   rawBody: Buffer,
@@ -117,11 +148,15 @@ export function duffelWebhookBodyCandidates(
     const reparsed = Buffer.from(JSON.stringify(parsed), "utf8");
     if (!reparsed.equals(rawBody)) add(reparsed);
     if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      const record = parsed as Record<string, unknown>;
       const sorted = Buffer.from(
-        JSON.stringify(parsed, Object.keys(parsed as object).sort()),
+        JSON.stringify(record, Object.keys(record).sort()),
         "utf8",
       );
       if (!sorted.equals(rawBody)) add(sorted);
+      for (const variant of duffelEventJsonVariants(record)) {
+        add(variant);
+      }
     }
   } catch {
     /* not JSON */

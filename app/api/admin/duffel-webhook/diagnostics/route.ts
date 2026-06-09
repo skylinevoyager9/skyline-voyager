@@ -3,6 +3,11 @@ import { assertDuffelReady, DuffelConfigError } from "@/lib/duffel/config";
 import { isDuffelWebhookSetupAuthorized } from "@/lib/duffel/webhook-auth";
 import { listDuffelWebhooks } from "@/lib/duffel/webhook-admin-service";
 import {
+  duffelPingBodyCandidates,
+  postSignedWebhook,
+  selfTestDuffelWebhookFromStore,
+} from "@/lib/duffel/webhook-self-test";
+import {
   fingerprintDuffelWebhookSecret,
   getDuffelWebhookLastFailure,
   getStoredDuffelWebhookEndpointId,
@@ -23,6 +28,15 @@ type DeliveryRecord = {
 
 type DeliveryListResponse = {
   data: DeliveryRecord[];
+};
+
+type WebhookEventRecord = Record<string, unknown> & {
+  id?: string;
+  type?: string;
+};
+
+type WebhookEventListResponse = {
+  data: WebhookEventRecord[];
 };
 
 /** Owner-only: compare Duffel dashboard vs Upstash and show last failed delivery. */
@@ -70,6 +84,36 @@ export async function GET(req: Request) {
     liveWebhooks.length > 0 &&
     !liveWebhooks.some((hook) => hook.id === storedEndpointId);
 
+  const selfTest = await selfTestDuffelWebhookFromStore();
+
+  let pingEvents: WebhookEventRecord[] = [];
+  try {
+    const json = await duffelRequest<WebhookEventListResponse>({
+      path: "/air/webhooks/events",
+      query: { type: "ping.triggered", limit: 3 },
+    });
+    pingEvents = json.data ?? [];
+  } catch (err) {
+    if (!(err instanceof DuffelApiError)) throw err;
+  }
+
+  const eventReplayTests = [];
+  const primarySecret = secrets[0];
+  for (const event of pingEvents.slice(0, 2)) {
+    for (const body of duffelPingBodyCandidates(event)) {
+      if (!primarySecret) break;
+      const replay = await postSignedWebhook(body, primarySecret);
+      eventReplayTests.push({
+        eventId: event.id,
+        bodyLength: body.length,
+        bodyPreview: body.toString("utf8").slice(0, 200),
+        status: replay.status,
+        ok: replay.status >= 200 && replay.status < 300,
+      });
+      if (replay.status >= 200 && replay.status < 300) break;
+    }
+  }
+
   return Response.json({
     ok: true,
     storedEndpointId,
@@ -84,6 +128,14 @@ export async function GET(req: Request) {
     storedHookFound: Boolean(storedHook),
     endpointMismatch,
     lastFailure,
+    selfTest,
+    pingEvents: pingEvents.map((event) => ({
+      id: event.id,
+      type: event.type,
+      serializedLength: JSON.stringify(event).length,
+      createdAt: event.created_at,
+    })),
+    eventReplayTests,
     recentDeliveries: deliveries.map((delivery) => ({
       id: delivery.id,
       type: delivery.type,

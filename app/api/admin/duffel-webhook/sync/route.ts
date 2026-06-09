@@ -6,10 +6,10 @@ import {
   pingDuffelWebhook,
   replaceDuffelWebhook,
 } from "@/lib/duffel/webhook-admin-service";
+import { selfTestDuffelWebhookFromStore } from "@/lib/duffel/webhook-self-test";
 import {
   fingerprintDuffelWebhookSecret,
-  storeDuffelWebhookSecret,
-  storeDuffelWebhookEndpointId,
+  storeDuffelWebhookConfig,
 } from "@/lib/duffel/webhook-secret-store";
 import { isRedisKvConfigured } from "@/lib/storage/redis-kv";
 
@@ -74,7 +74,10 @@ export async function POST(req: Request) {
 
   try {
     const replaced = await replaceDuffelWebhook();
-    const { stored, roundTripOk } = await storeDuffelWebhookSecret(replaced.secret);
+    const { stored, roundTripOk, endpointStored } = await storeDuffelWebhookConfig(
+      replaced.secret,
+      replaced.endpointId,
+    );
     if (!stored) {
       return Response.json({ ok: false, error: "Failed to store webhook secret in Upstash." }, { status: 500 });
     }
@@ -88,8 +91,7 @@ export async function POST(req: Request) {
       );
     }
 
-    await storeDuffelWebhookEndpointId(replaced.endpointId);
-
+    const selfTest = await selfTestDuffelWebhookFromStore();
     const fingerprint = fingerprintDuffelWebhookSecret(replaced.secret);
     const base = {
       endpointId: replaced.endpointId,
@@ -98,19 +100,36 @@ export async function POST(req: Request) {
       deletedEndpointIds: replaced.deletedEndpointIds,
       secretFingerprint: fingerprint,
       storedInUpstash: true,
-      /** For debugging only — secret is already in Upstash; do not paste into Vercel env. */
+      endpointStored,
+      selfTestOk: selfTest.ok,
+      selfTestStatus: selfTest.status,
+      /** For debugging only — secret is already in Upstash. */
       duffelWebhookSecret: replaced.secret,
     };
+
+    if (!selfTest.ok) {
+      return Response.json(
+        {
+          ok: false,
+          error: "Webhook secret stored but server self-test failed.",
+          selfTest,
+          ...base,
+          hint: "Upstash secret is not readable by the webhook handler. Check UPSTASH_REDIS_REST_URL/TOKEN on Production.",
+        },
+        { status: 500 },
+      );
+    }
 
     try {
       const ping = await pingDuffelWebhookWithRetries(replaced.endpointId);
       return Response.json({
         ok: true,
         message:
-          "Webhook recreated, secret saved to Upstash, ping succeeded. Check Duffel delivery log for 200.",
+          "Webhook recreated, secret saved to Upstash, self-test and Duffel ping succeeded.",
         pingAttempts: ping.attempts,
+        selfTest,
         ...base,
-        hint: "Secret lives in Upstash only — keep DUFFEL_WEBHOOK_SECRET unset in Vercel.",
+        hint: "Ping Duffel dashboard delivery log should show 200.",
       });
     } catch (pingErr) {
       if (pingErr instanceof DuffelApiError && pingErr.status === 422) {
@@ -119,13 +138,14 @@ export async function POST(req: Request) {
           partial: true,
           pingFailed: true,
           message:
-            "Webhook created and secret saved to Upstash. Auto-ping got a non-200 (often a short timing race). Ping manually in Duffel — the endpoint should work once Upstash is warm.",
+            "Secret saved and server self-test passed, but Duffel auto-ping returned non-200. Ping manually in Duffel, then check /api/admin/duffel-webhook/diagnostics for lastFailure.bodyPreview.",
+          selfTest,
           ...base,
           duffelStatus: pingErr.status,
           hint:
-            "1) Do not set DUFFEL_WEBHOOK_SECRET in Vercel. 2) Duffel → Developers → Webhooks → Ping on endpoint " +
+            "Duffel → Developers → Webhooks → Ping endpoint " +
             replaced.endpointId +
-            ". 3) Confirm https://skylinevoyager.com/api/duffel/webhook/status shows the same secretFingerprint.",
+            ". If still 400, open diagnostics — Duffel sends a ~261-byte JSON body.",
         });
       }
       throw pingErr;
